@@ -1,0 +1,233 @@
+# 微服务产品从开发
+
+
+
+## 工程结构
+
+- 全局系统异常
+
+  Http状态码
+
+​       500 内部服务器异常，API 网关层捕获并抛出 -> JSON
+
+- 全局业务异常
+
+   自定义异常，在DAO、Service、
+
+   Controller，一定是Service throws Exception，异常格式
+
+  { 
+
+  ​	status: 5000
+
+   	message: "余额不足"
+
+  }
+
+ 二方库版本号命名方式
+
+- 主版本号：产品方向改变，或者大规模API不兼容，或者架构不兼容升级。
+
+- 次版本号：保持相对兼容性，增加主要功能特性，影响范围极小的API不兼容修改
+
+- 修订号：保持完全兼容，修复BUG，新增次要功能特性等。
+
+  > 注意：起始版本号必须是`1.0.0`，而不是`0.0.1`，如当前版本是`1.3.3`，那么下一个合理的版本号是`1.3.4`或`1.4.0`或`2.0.0`
+
+所有pom文件中的依赖声明放在<dependencies>语句块中，所有版本仲裁放在<dependencyManagement>语句块中。<dependencies>里只是声明版本，并不实现引入，因此子项目需要显示的声明依赖，version和scope都读取自父pom。而<dependencies>所有声明在主pom的<dependencies>里的依赖都会自动引入，并默认被所有的子项目继承。
+
+## 工程结构实践
+
+### GitLab创建群组
+
+- ewin-dependencies：通用依赖版本控制：依赖于一个二方库群组，必须定义一个统一的版本变量，避免版本不一致。
+- ewin-parent：通用父工程：产品线下的所有项目必须指定一个父工程项目，以复用POM的配置。
+- ewin-commons：通用类库工具类：如HuTool等开源类库依赖或二次开发等。
+- ewin-generator：通用代码生成器：如MyBatis Plus等其他开源类库或自定义代码生成器。
+- ewin-repository：数据访问层：与底层MySQL、Oracle、Hbase等进行数据交互。
+- ewin-business：业务逻辑层：相对具体的业务逻辑服务层
+- ewin-manager：通用处理层：对第三方平台封装的层，预处理返回结果及转化异常信息，对业务逻辑层通用能力的下沉，如缓存方案、中间件通用处理。与数据访问层交互，对多个数据访问层的组合复用。
+- ewin-controller：请求处理层：主要对访问控制进行转发，各类基本参数校验，或者不复用的业务简单处理等
+- ewin-apiserver：开放接口网关层：可直接封装Service方法暴露成RPC接口；通过Web封装成HTTP接口；进行网关安全控制、流量控制等
+- ewin-cloud：外部接口或第三方平台：包括其他部门RPC开放接口，基础平台，其他公司的HTTP接口。
+- ewin-oauth：认证与授权：独立的认证与授权服务
+- ewin-all：单体应用打包器：适用于产品的初期运行阶段，利用单体应用的便利性先上线属于临时过渡项目
+- ewin-dashboard：终端显示层：前后分离方案，采用Vue+ElementUI组件库实现的平台控制面板项目
+- ewin-portal：终端显示层：前后分离方案。采用Vue+Vuetify组件库实现的平台门户网站项目。
+- docs：用于存放项目文档的目录
+- bin：用于存放构建工具的目录
+
+- 模块化方式      <-管理和打包方便
+
+​	ewin   <-群组
+
+​		ewin-dao	<-module
+
+​		ewin-service
+
+​		ewin-controller
+
+​	mvn package    <-一个打包命令，将所有module都分别打包
+
+​		ewin-dao.jar
+
+​		ewin-service.jar
+
+​		ewin-controller.jar
+
+- 拆分方式	<-每个Module分别打包   **防止所有源码泄露**
+
+  ewin-dao
+
+  ​	mvn package
+
+  ​	ewin-dao.jar
+
+  ewin-service
+
+  ​	mvn package
+
+  ​	ewin-service.jar
+
+  ewin-controller
+
+  ​	mvn package
+
+  ​	ewin-controller.jar
+
+认证与授权非侵入式
+
+ 	不改变源码的情况下增加新的功能，AOP编程思想，如拦截器
+
+## 开发工具准备
+
+IDEA插件安装网站 https://plugins.jetbrains.com/
+
+必备工具
+
+- SwitchHosts        将IP映射到域名
+
+- Postman
+
+- NodeJS                  http://nodejs.cn/download
+
+- VSCode
+
+IDEA安装必备插件
+
+- GenerateAllSetter： 一键生成getter/setter
+- GenerateSerialVersionUID：一键生成序列化ID
+- JRebel：热部署
+- Lombok：简化getter/setter方法
+- POJO to JSON：一键复制实体类为Json格式（对实体类右键 -> MakeJson）
+
+  ## Maven私服配置
+
+### Nexus
+
+实际企业开发过程中，所有依赖都会从私服下载，需要在Nexus上配置相对应的Maven代理
+
+Nexus相当于Maven的服务端，本地Maven相当于客户端
+
+#### 创建代理仓库
+
+目前只需要配置三个必须的代理仓库（`aliyun-nexus`，`spring-milestone`，`spring-snapshot`），如果还有其他的代理仓库，配置流程同下
+
+- 登录Nexus服务器
+
+- 点击`设置按钮` -> `Repository` -> `Repositories`
+
+- 点击`Create repository` ->  选择`maven2(proxy)`
+
+- 配置Spring Release版
+
+  + Name: `spring-milestone`
+  + Version pollcy:`Release`
+  + Remote storage:`https://repo.spring.io/release`
+
+- 配置Spring快照版
+
+  + Name: `spring-snapshot`
+  + Version pollcy:`Snapshot`
+  + Remote storage:`https://repo.spring.io/snapshot`
+
+- 配置阿里云仓库代理（版本策略为Release)
+
+  + Name: `aliyun-nexus`
+
+  + Version pollcy: `Release`
+
+  + Remote storage: `http://maven.aliyun.nexus/content/groups/public/`
+
+- 设置代理仓库优先级
+
+  + 选择 `maven-public`
+  
+  + 在`Group`右侧的`Members`调整优先级，将`aliyun-nexus`设置为最顶部
+  
+  + 点击`Save`
+  
+- 自己开发的Release和快照版本会放到`maven-release`和`maven-snapshots`两个仓库里
+  
+- 创建快照删除Task，点击右侧菜单`System`的`Tasks`
+
+  + 点击`Create task`，选择`Maven - Delete SNAPSHOT`
+  + Task name: `Delete SNAPSHOT`
+  + Repository:(All Repositories)
+  + Snapshot retention(days): 0
+  + Task frequency: Manual  (也可以选择时间自动触发)
+  + 点击`Create`
+
+- 修改本地Maven的`settings.xml`
+
+  + 修改本地仓库地址 <localRepository>C:\Users\HP\.m2\repository</localRepository>
+
+  + 配置Nexus Server，如果Nexus不允许匿名访问，需要配置账号
+
+    ```xml
+        <server>
+          <id>nexus-public</id>   <!-- 从私服拉取依赖的账号，对应下面的mirror -->
+          <username>admin</username>
+          <password>admin</password>
+        </server>
+        <server>
+          <id>nexus-releases</id>  <!-- 部署发行版本 -->
+          <username>admin</username>
+          <password>admin</password>
+        </server>
+        <server>
+          <id>nexus-snapshots</id>  <!-- 部署快照版本 -->
+          <username>admin</username>
+          <password>admin</password>
+        </server> 
+    ```
+
+    <username>也可以使用在Nexus配置好的用户
+
+  + 配置mirror
+  
+    ~~~xml
+        <mirror>
+          <id>nexus-public</id> <!-- 需要与`server`元素中的`id`匹配-->
+          <mirrorOf>*</mirrorOf> <!-- 可以是central(只有中央仓库的依赖才通过私服下载)或*(所有依赖都通过私服下载)-->
+          <name>Nexus Public</name> <!-- 任意-->
+          <url>http://192.168.1.205/repository/maven-public/</url> <!-- 仓库地址，maven-public是group类型，包含很多其他厂库-->
+        </mirror>
+    ~~~
+  
+    
+
+## 后端工程配置
+
+### pom创建顺序
+
+1. 通用依赖
+2. 独立项目
+3. 数据持久层
+4. 第三方平台
+5. 通用处理层
+6. 业务逻辑层
+7. 认证与授权
+8. 请求处理层
+9. 开放接口网关层
+10. 单体应用打包器
