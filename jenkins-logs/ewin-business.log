@@ -1,0 +1,819 @@
+Started by user root
+Running as SYSTEM
+[EnvInject] - Loading node environment variables.
+Building in workspace /var/jenkins_home/workspace/ewin/ewin-business
+using credential aae9bff8-ddf5-48a2-adbe-537d71aa9dec
+ > git rev-parse --is-inside-work-tree # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url http://192.168.1.203:8090/ewin/ewin-business.git # timeout=10
+Fetching upstream changes from http://192.168.1.203:8090/ewin/ewin-business.git
+ > git --version # timeout=10
+using GIT_ASKPASS to set credentials 
+ > git fetch --tags --progress -- http://192.168.1.203:8090/ewin/ewin-business.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+ > git rev-parse refs/remotes/origin/origin/master^{commit} # timeout=10
+Checking out Revision 455199622d0e37db16fcb33b740e4b699063932c (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 455199622d0e37db16fcb33b740e4b699063932c # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D master # timeout=10
+ > git checkout -b master 455199622d0e37db16fcb33b740e4b699063932c # timeout=10
+Commit message: "for release"
+ > git rev-list --no-walk 19a350e452edb2befa069724c2a4abce304e91bf # timeout=10
+[ewin-business] $ /bin/sh -xe /tmp/jenkins9060772640235602056.sh
++ [ RELEASEx = RELEASEx ]
++ /var/jenkins_home/envs/apache-maven-3.6.3/bin/mvn release:clean release:prepare -DignoreSnapshots=true release:perform
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] ewin-business                                                      [pom]
+[INFO] ewin-business-core                                                 [jar]
+[INFO] 
+[INFO] -----------------------< com.ewin:ewin-business >-----------------------
+[INFO] Building ewin-business 1.0.2-SNAPSHOT                              [1/2]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- maven-release-plugin:2.5.3:clean (default-cli) @ ewin-business ---
+[INFO] Cleaning up after release...
+[INFO] 
+[INFO] --- maven-release-plugin:2.5.3:prepare (default-cli) @ ewin-business ---
+[INFO] Change the default 'git' provider implementation to 'jgit'.
+[INFO] Verifying that there are no local modifications...
+[INFO]   ignoring changes on: **/pom.xml.releaseBackup, **/pom.xml.next, **/pom.xml.tag, **/pom.xml.branch, **/release.properties, **/pom.xml.backup
+[INFO] Ignoring SNAPSHOT depenedencies and plugins ...
+[INFO] Transforming 'ewin-business'...
+[INFO] Transforming 'ewin-business-core'...
+[INFO] Not generating release POMs
+[INFO] Executing goals 'clean verify'...
+[WARNING] Maven will be executed in interactive mode, but no input stream has been configured for this MavenInvoker instance.
+[INFO] [INFO] Scanning for projects...
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] [INFO] Reactor Build Order:
+[INFO] [INFO] 
+[INFO] [INFO] ewin-business                                                      [pom]
+[INFO] [INFO] ewin-business-core                                                 [jar]
+[INFO] [INFO] 
+[INFO] [INFO] -----------------------< com.ewin:ewin-business >-----------------------
+[INFO] [INFO] Building ewin-business 1.0.2.RELEASE                               [1/2]
+[INFO] [INFO] --------------------------------[ pom ]---------------------------------
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-clean-plugin:3.1.0:clean (default-clean) @ ewin-business ---
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-enforcer-plugin:3.0.0-M3:enforce (enforce-rules) @ ewin-business ---
+[INFO] [INFO] 
+[INFO] [INFO] --------------------< com.ewin:ewin-business-core >---------------------
+[INFO] [INFO] Building ewin-business-core 1.0.2.RELEASE                          [2/2]
+[INFO] [INFO] --------------------------------[ jar ]---------------------------------
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-clean-plugin:3.1.0:clean (default-clean) @ ewin-business-core ---
+[INFO] [INFO] Deleting /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/target
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-enforcer-plugin:3.0.0-M3:enforce (enforce-rules) @ ewin-business-core ---
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-resources-plugin:3.1.0:resources (default-resources) @ ewin-business-core ---
+[INFO] [INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] [INFO] Copying 1 resource
+[INFO] [INFO] Copying 0 resource
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ ewin-business-core ---
+[INFO] [INFO] Changes detected - recompiling the module!
+[INFO] [INFO] Compiling 5 source files to /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/target/classes
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-resources-plugin:3.1.0:testResources (default-testResources) @ ewin-business-core ---
+[INFO] [INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] [INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/src/test/resources
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ ewin-business-core ---
+[INFO] [INFO] Changes detected - recompiling the module!
+[INFO] [INFO] Compiling 1 source file to /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/target/test-classes
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-surefire-plugin:3.0.0-M4:test (default-test) @ ewin-business-core ---
+[INFO] [INFO] Tests are skipped.
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-jar-plugin:3.2.0:jar (default-jar) @ ewin-business-core ---
+[INFO] [INFO] Building jar: /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/target/ewin-business-core-1.0.2.RELEASE.jar
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] [INFO] Reactor Summary for ewin-business 1.0.2.RELEASE:
+[INFO] [INFO] 
+[INFO] [INFO] ewin-business ...................................... SUCCESS [  0.914 s]
+[INFO] [INFO] ewin-business-core ................................. SUCCESS [  3.562 s]
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] [INFO] BUILD SUCCESS
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] [INFO] Total time:  5.043 s
+[INFO] [INFO] Finished at: 2020-06-08T21:40:33+08:00
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] Checking in modified POMs...
+[INFO] commit done: [maven-release-plugin] prepare release 1.0.2.RELEASE
+[INFO] push changes to remote... refs/heads/master:refs/heads/master
+[INFO] fetch url: http://wh:******@192.168.1.203:8090/ewin/ewin-business.git
+[INFO] push url: http://wh:******@192.168.1.203:8090/ewin/ewin-business.git
+[INFO] OK - RemoteRefUpdate[remoteName=refs/heads/master, OK, (null)...8d9fd87c6603a93f894b64dcf39797eca3df35c3, fastForward, srcRef=refs/heads/master, message=null]
+[INFO] Tagging release with the label 1.0.2.RELEASE...
+[INFO] push tag [1.0.2.RELEASE] to remote...
+[INFO] fetch url: http://wh:******@192.168.1.203:8090/ewin/ewin-business.git
+[INFO] push url: http://wh:******@192.168.1.203:8090/ewin/ewin-business.git
+[INFO] OK - RemoteRefUpdate[remoteName=refs/tags/1.0.2.RELEASE, OK, (null)...4f2a575d8957286647144c32b442885a02181718, fastForward, srcRef=refs/tags/1.0.2.RELEASE, message=null]
+[INFO] Transforming 'ewin-business'...
+[INFO] Transforming 'ewin-business-core'...
+[INFO] Not removing release POMs
+[INFO] Checking in modified POMs...
+[INFO] commit done: [maven-release-plugin] prepare for next development iteration
+[INFO] push changes to remote... refs/heads/master:refs/heads/master
+[INFO] fetch url: http://wh:******@192.168.1.203:8090/ewin/ewin-business.git
+[INFO] push url: http://wh:******@192.168.1.203:8090/ewin/ewin-business.git
+[INFO] OK - RemoteRefUpdate[remoteName=refs/heads/master, OK, (null)...bf58c2c8568e8004af576958d595778d77a83cd1, fastForward, srcRef=refs/heads/master, message=null]
+[INFO] Release preparation complete.
+[INFO] 
+[INFO] --- maven-release-plugin:2.5.3:perform (default-cli) @ ewin-business ---
+[INFO] Change the default 'git' provider implementation to 'jgit'.
+[INFO] Checking out the project to perform the release ...
+[INFO] cloning [1.0.2.RELEASE] to /var/jenkins_home/workspace/ewin/ewin-business/target/checkout
+
+remote: Enumerating objects: 118
+remote: Enumerating objects: 118
+
+remote: Counting objects:   0% (  1/118)
+remote: Counting objects:   1% (  2/118)
+remote: Counting objects:   2% (  3/118)
+remote: Counting objects:   3% (  4/118)
+remote: Counting objects:   4% (  5/118)
+remote: Counting objects:   5% (  6/118)
+remote: Counting objects:   6% (  8/118)
+remote: Counting objects:   7% (  9/118)
+remote: Counting objects:   8% ( 10/118)
+remote: Counting objects:   9% ( 11/118)
+remote: Counting objects:  10% ( 12/118)
+remote: Counting objects:  11% ( 13/118)
+remote: Counting objects:  12% ( 15/118)
+remote: Counting objects:  13% ( 16/118)
+remote: Counting objects:  14% ( 17/118)
+remote: Counting objects:  15% ( 18/118)
+remote: Counting objects:  16% ( 19/118)
+remote: Counting objects:  17% ( 21/118)
+remote: Counting objects:  18% ( 22/118)
+remote: Counting objects:  19% ( 23/118)
+remote: Counting objects:  20% ( 24/118)
+remote: Counting objects:  21% ( 25/118)
+remote: Counting objects:  22% ( 26/118)
+remote: Counting objects:  23% ( 28/118)
+remote: Counting objects:  24% ( 29/118)
+remote: Counting objects:  25% ( 30/118)
+remote: Counting objects:  26% ( 31/118)
+remote: Counting objects:  27% ( 32/118)
+remote: Counting objects:  28% ( 34/118)
+remote: Counting objects:  29% ( 35/118)
+remote: Counting objects:  30% ( 36/118)
+remote: Counting objects:  31% ( 37/118)
+remote: Counting objects:  32% ( 38/118)
+remote: Counting objects:  33% ( 39/118)
+remote: Counting objects:  34% ( 41/118)
+remote: Counting objects:  35% ( 42/118)
+remote: Counting objects:  36% ( 43/118)
+remote: Counting objects:  37% ( 44/118)
+remote: Counting objects:  38% ( 45/118)
+remote: Counting objects:  39% ( 47/118)
+remote: Counting objects:  40% ( 48/118)
+remote: Counting objects:  41% ( 49/118)
+remote: Counting objects:  42% ( 50/118)
+remote: Counting objects:  43% ( 51/118)
+remote: Counting objects:  44% ( 52/118)
+remote: Counting objects:  45% ( 54/118)
+remote: Counting objects:  46% ( 55/118)
+remote: Counting objects:  47% ( 56/118)
+remote: Counting objects:  48% ( 57/118)
+remote: Counting objects:  49% ( 58/118)
+remote: Counting objects:  50% ( 59/118)
+remote: Counting objects:  51% ( 61/118)
+remote: Counting objects:  52% ( 62/118)
+remote: Counting objects:  53% ( 63/118)
+remote: Counting objects:  54% ( 64/118)
+remote: Counting objects:  55% ( 65/118)
+remote: Counting objects:  56% ( 67/118)
+remote: Counting objects:  57% ( 68/118)
+remote: Counting objects:  58% ( 69/118)
+remote: Counting objects:  59% ( 70/118)
+remote: Counting objects:  60% ( 71/118)
+remote: Counting objects:  61% ( 72/118)
+remote: Counting objects:  62% ( 74/118)
+remote: Counting objects:  63% ( 75/118)
+remote: Counting objects:  64% ( 76/118)
+remote: Counting objects:  65% ( 77/118)
+remote: Counting objects:  66% ( 78/118)
+remote: Counting objects:  67% ( 80/118)
+remote: Counting objects:  68% ( 81/118)
+remote: Counting objects:  69% ( 82/118)
+remote: Counting objects:  70% ( 83/118)
+remote: Counting objects:  71% ( 84/118)
+remote: Counting objects:  72% ( 85/118)
+remote: Counting objects:  73% ( 87/118)
+remote: Counting objects:  74% ( 88/118)
+remote: Counting objects:  75% ( 89/118)
+remote: Counting objects:  76% ( 90/118)
+remote: Counting objects:  77% ( 91/118)
+remote: Counting objects:  78% ( 93/118)
+remote: Counting objects:  79% ( 94/118)
+remote: Counting objects:  80% ( 95/118)
+remote: Counting objects:  81% ( 96/118)
+remote: Counting objects:  82% ( 97/118)
+remote: Counting objects:  83% ( 98/118)
+remote: Counting objects:  84% (100/118)
+remote: Counting objects:  85% (101/118)
+remote: Counting objects:  86% (102/118)
+remote: Counting objects:  87% (103/118)
+remote: Counting objects:  88% (104/118)
+remote: Counting objects:  89% (106/118)
+remote: Counting objects:  90% (107/118)
+remote: Counting objects:  91% (108/118)
+remote: Counting objects:  92% (109/118)
+remote: Counting objects:  93% (110/118)
+remote: Counting objects:  94% (111/118)
+remote: Counting objects:  95% (113/118)
+remote: Counting objects:  96% (114/118)
+remote: Counting objects:  97% (115/118)
+remote: Counting objects:  98% (116/118)
+remote: Counting objects:  99% (117/118)
+remote: Counting objects: 100% (118/118)
+remote: Counting objects: 100% (118/118)
+
+remote: Compressing objects:   1% ( 1/55)
+remote: Compressing objects:   3% ( 2/55)
+remote: Compressing objects:   5% ( 3/55)
+remote: Compressing objects:   7% ( 4/55)
+remote: Compressing objects:   9% ( 5/55)
+remote: Compressing objects:  10% ( 6/55)
+remote: Compressing objects:  12% ( 7/55)
+remote: Compressing objects:  14% ( 8/55)
+remote: Compressing objects:  16% ( 9/55)
+remote: Compressing objects:  18% (10/55)
+remote: Compressing objects:  20% (11/55)
+remote: Compressing objects:  21% (12/55)
+remote: Compressing objects:  23% (13/55)
+remote: Compressing objects:  25% (14/55)
+remote: Compressing objects:  27% (15/55)
+remote: Compressing objects:  29% (16/55)
+remote: Compressing objects:  30% (17/55)
+remote: Compressing objects:  32% (18/55)
+remote: Compressing objects:  34% (19/55)
+remote: Compressing objects:  36% (20/55)
+remote: Compressing objects:  38% (21/55)
+remote: Compressing objects:  40% (22/55)
+remote: Compressing objects:  41% (23/55)
+remote: Compressing objects:  43% (24/55)
+remote: Compressing objects:  45% (25/55)
+remote: Compressing objects:  47% (26/55)
+remote: Compressing objects:  49% (27/55)
+remote: Compressing objects:  50% (28/55)
+remote: Compressing objects:  52% (29/55)
+remote: Compressing objects:  54% (30/55)
+remote: Compressing objects:  56% (31/55)
+remote: Compressing objects:  58% (32/55)
+remote: Compressing objects:  60% (33/55)
+remote: Compressing objects:  61% (34/55)
+remote: Compressing objects:  63% (35/55)
+remote: Compressing objects:  65% (36/55)
+remote: Compressing objects:  67% (37/55)
+remote: Compressing objects:  69% (38/55)
+remote: Compressing objects:  70% (39/55)
+remote: Compressing objects:  72% (40/55)
+remote: Compressing objects:  74% (41/55)
+remote: Compressing objects:  76% (42/55)
+remote: Compressing objects:  78% (43/55)
+remote: Compressing objects:  80% (44/55)
+remote: Compressing objects:  81% (45/55)
+remote: Compressing objects:  83% (46/55)
+remote: Compressing objects:  85% (47/55)
+remote: Compressing objects:  87% (48/55)
+remote: Compressing objects:  89% (49/55)
+remote: Compressing objects:  90% (50/55)
+remote: Compressing objects:  92% (51/55)
+remote: Compressing objects:  94% (52/55)
+remote: Compressing objects:  96% (53/55)
+remote: Compressing objects:  98% (54/55)
+remote: Compressing objects: 100% (55/55)
+remote: Compressing objects: 100% (55/55)
+
+Receiving objects:        0% (  1/118)
+Receiving objects:        1% (  2/118)
+Receiving objects:        2% (  3/118)
+Receiving objects:        3% (  4/118)
+Receiving objects:        4% (  5/118)
+Receiving objects:        5% (  6/118)
+Receiving objects:        6% (  8/118)
+Receiving objects:        7% (  9/118)
+Receiving objects:        8% ( 10/118)
+Receiving objects:        9% ( 11/118)
+Receiving objects:       10% ( 12/118)
+Receiving objects:       11% ( 13/118)
+Receiving objects:       12% ( 15/118)
+Receiving objects:       13% ( 16/118)
+Receiving objects:       14% ( 17/118)
+Receiving objects:       15% ( 18/118)
+Receiving objects:       16% ( 19/118)
+Receiving objects:       17% ( 21/118)
+Receiving objects:       18% ( 22/118)
+Receiving objects:       19% ( 23/118)
+Receiving objects:       20% ( 24/118)
+Receiving objects:       21% ( 25/118)
+Receiving objects:       22% ( 26/118)
+Receiving objects:       23% ( 28/118)
+Receiving objects:       24% ( 29/118)
+Receiving objects:       25% ( 30/118)
+Receiving objects:       26% ( 31/118)
+Receiving objects:       27% ( 32/118)
+Receiving objects:       28% ( 34/118)
+Receiving objects:       29% ( 35/118)
+Receiving objects:       30% ( 36/118)
+Receiving objects:       31% ( 37/118)
+Receiving objects:       32% ( 38/118)
+Receiving objects:       33% ( 39/118)
+Receiving objects:       34% ( 41/118)
+Receiving objects:       35% ( 42/118)
+Receiving objects:       36% ( 43/118)
+Receiving objects:       37% ( 44/118)
+Receiving objects:       38% ( 45/118)
+Receiving objects:       39% ( 47/118)
+Receiving objects:       40% ( 48/118)
+Receiving objects:       41% ( 49/118)
+Receiving objects:       42% ( 50/118)
+Receiving objects:       43% ( 51/118)
+Receiving objects:       44% ( 52/118)
+Receiving objects:       45% ( 54/118)
+Receiving objects:       46% ( 55/118)
+Receiving objects:       47% ( 56/118)
+Receiving objects:       48% ( 57/118)
+Receiving objects:       49% ( 58/118)
+Receiving objects:       50% ( 59/118)
+Receiving objects:       51% ( 61/118)
+Receiving objects:       52% ( 62/118)
+Receiving objects:       53% ( 63/118)
+Receiving objects:       54% ( 64/118)
+Receiving objects:       55% ( 65/118)
+Receiving objects:       56% ( 67/118)
+Receiving objects:       57% ( 68/118)
+Receiving objects:       58% ( 69/118)
+Receiving objects:       59% ( 70/118)
+Receiving objects:       60% ( 71/118)
+Receiving objects:       61% ( 72/118)
+Receiving objects:       62% ( 74/118)
+Receiving objects:       63% ( 75/118)
+Receiving objects:       64% ( 76/118)
+Receiving objects:       65% ( 77/118)
+Receiving objects:       66% ( 78/118)
+Receiving objects:       67% ( 80/118)
+Receiving objects:       68% ( 81/118)
+Receiving objects:       69% ( 82/118)
+Receiving objects:       70% ( 83/118)
+Receiving objects:       71% ( 84/118)
+Receiving objects:       72% ( 85/118)
+Receiving objects:       73% ( 87/118)
+Receiving objects:       74% ( 88/118)
+Receiving objects:       75% ( 89/118)
+Receiving objects:       76% ( 90/118)
+Receiving objects:       77% ( 91/118)
+Receiving objects:       78% ( 93/118)
+Receiving objects:       79% ( 94/118)
+Receiving objects:       80% ( 95/118)
+Receiving objects:       81% ( 96/118)
+Receiving objects:       82% ( 97/118)
+Receiving objects:       83% ( 98/118)
+Receiving objects:       84% (100/118)
+Receiving objects:       85% (101/118)
+Receiving objects:       86% (102/118)
+Receiving objects:       87% (103/118)
+Receiving objects:       88% (104/118)
+Receiving objects:       89% (106/118)
+Receiving objects:       90% (107/118)
+Receiving objects:       91% (108/118)
+Receiving objects:       92% (109/118)
+Receiving objects:       93% (110/118)
+Receiving objects:       94% (111/118)
+Receiving objects:       95% (113/118)
+Receiving objects:       96% (114/118)
+Receiving objects:       97% (115/118)
+Receiving objects:       98% (116/118)
+Receiving objects:       99% (117/118)
+Receiving objects:      100% (118/118)
+Receiving objects:      100% (118/118)
+
+Resolving deltas:         2% ( 1/47)
+Resolving deltas:         4% ( 2/47)
+Resolving deltas:         6% ( 3/47)
+Resolving deltas:         8% ( 4/47)
+Resolving deltas:        10% ( 5/47)
+Resolving deltas:        12% ( 6/47)
+Resolving deltas:        14% ( 7/47)
+Resolving deltas:        17% ( 8/47)
+Resolving deltas:        19% ( 9/47)
+Resolving deltas:        21% (10/47)
+Resolving deltas:        23% (11/47)
+Resolving deltas:        25% (12/47)
+Resolving deltas:        27% (13/47)
+Resolving deltas:        29% (14/47)
+Resolving deltas:        31% (15/47)
+Resolving deltas:        34% (16/47)
+Resolving deltas:        36% (17/47)
+Resolving deltas:        38% (18/47)
+Resolving deltas:        40% (19/47)
+Resolving deltas:        42% (20/47)
+Resolving deltas:        44% (21/47)
+Resolving deltas:        46% (22/47)
+Resolving deltas:        48% (23/47)
+Resolving deltas:        51% (24/47)
+Resolving deltas:        53% (25/47)
+Resolving deltas:        55% (26/47)
+Resolving deltas:        57% (27/47)
+Resolving deltas:        59% (28/47)
+Resolving deltas:        61% (29/47)
+Resolving deltas:        63% (30/47)
+Resolving deltas:        65% (31/47)
+Resolving deltas:        68% (32/47)
+Resolving deltas:        70% (33/47)
+Resolving deltas:        72% (34/47)
+Resolving deltas:        74% (35/47)
+Resolving deltas:        76% (36/47)
+Resolving deltas:        78% (37/47)
+Resolving deltas:        80% (38/47)
+Resolving deltas:        82% (39/47)
+Resolving deltas:        85% (40/47)
+Resolving deltas:        87% (41/47)
+Resolving deltas:        89% (42/47)
+Resolving deltas:        91% (43/47)
+Resolving deltas:        93% (44/47)
+Resolving deltas:        95% (45/47)
+Resolving deltas:        97% (46/47)
+Resolving deltas:       100% (47/47)
+Resolving deltas:       100% (47/47)
+
+Updating references:     33% (1/3)
+Updating references:     66% (2/3)
+Updating references:    100% (3/3)
+Updating references:    100% (3/3)
+[INFO] fetch url: http://wh:******@192.168.1.203:8090/ewin/ewin-business.git
+[INFO] push url: http://wh:******@192.168.1.203:8090/ewin/ewin-business.git
+[INFO] checkout tag [1.0.2.RELEASE] at /var/jenkins_home/workspace/ewin/ewin-business/target/checkout
+[INFO] Invoking perform goals in directory /var/jenkins_home/workspace/ewin/ewin-business/target/checkout
+[INFO] Executing goals '-f pom.xml deploy'...
+[WARNING] Maven will be executed in interactive mode, but no input stream has been configured for this MavenInvoker instance.
+[INFO] [INFO] Scanning for projects...
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] [INFO] Reactor Build Order:
+[INFO] [INFO] 
+[INFO] [INFO] ewin-business                                                      [pom]
+[INFO] [INFO] ewin-business-core                                                 [jar]
+[INFO] [INFO] 
+[INFO] [INFO] -----------------------< com.ewin:ewin-business >-----------------------
+[INFO] [INFO] Building ewin-business 1.0.2.RELEASE                               [1/2]
+[INFO] [INFO] --------------------------------[ pom ]---------------------------------
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-enforcer-plugin:3.0.0-M3:enforce (enforce-rules) @ ewin-business ---
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-source-plugin:3.2.1:jar-no-fork (attach-sources) @ ewin-business ---
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-javadoc-plugin:3.1.1:jar (attach-javadocs) @ ewin-business ---
+[INFO] [INFO] Not executing Javadoc as the project is not a Java classpath-capable package
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-install-plugin:3.0.0-M1:install (default-install) @ ewin-business ---
+[INFO] [INFO] Installing /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/pom.xml to /var/jenkins_home/envs/apache-maven-3.6.1/repo/com/ewin/ewin-business/1.0.2.RELEASE/ewin-business-1.0.2.RELEASE.pom
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-deploy-plugin:2.8.2:deploy (default-deploy) @ ewin-business ---
+[INFO] Uploading to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business/1.0.2.RELEASE/ewin-business-1.0.2.RELEASE.pom
+[INFO] Progress (1): 1.9 kB
+[INFO]                     
+[INFO] Uploaded to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business/1.0.2.RELEASE/ewin-business-1.0.2.RELEASE.pom (1.9 kB at 10 kB/s)
+[INFO] Downloading from nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business/maven-metadata.xml
+[INFO] Progress (1): 317 B
+[INFO]                    
+[INFO] Downloaded from nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business/maven-metadata.xml (317 B at 11 kB/s)
+[INFO] Uploading to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business/maven-metadata.xml
+[INFO] Progress (1): 356 B
+[INFO]                    
+[INFO] Uploaded to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business/maven-metadata.xml (356 B at 4.9 kB/s)
+[INFO] [INFO] 
+[INFO] [INFO] --------------------< com.ewin:ewin-business-core >---------------------
+[INFO] [INFO] Building ewin-business-core 1.0.2.RELEASE                          [2/2]
+[INFO] [INFO] --------------------------------[ jar ]---------------------------------
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-enforcer-plugin:3.0.0-M3:enforce (enforce-rules) @ ewin-business-core ---
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-resources-plugin:3.1.0:resources (default-resources) @ ewin-business-core ---
+[INFO] [INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] [INFO] Copying 1 resource
+[INFO] [INFO] Copying 0 resource
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ ewin-business-core ---
+[INFO] [INFO] Changes detected - recompiling the module!
+[INFO] [INFO] Compiling 5 source files to /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/target/classes
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-resources-plugin:3.1.0:testResources (default-testResources) @ ewin-business-core ---
+[INFO] [INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] [INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/src/test/resources
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ ewin-business-core ---
+[INFO] [INFO] Changes detected - recompiling the module!
+[INFO] [INFO] Compiling 1 source file to /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/target/test-classes
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-surefire-plugin:3.0.0-M4:test (default-test) @ ewin-business-core ---
+[INFO] [INFO] Tests are skipped.
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-jar-plugin:3.2.0:jar (default-jar) @ ewin-business-core ---
+[INFO] [INFO] Building jar: /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/target/ewin-business-core-1.0.2.RELEASE.jar
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-source-plugin:3.2.1:jar-no-fork (attach-sources) @ ewin-business-core ---
+[INFO] [INFO] Building jar: /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/target/ewin-business-core-1.0.2.RELEASE-sources.jar
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-javadoc-plugin:3.1.1:jar (attach-javadocs) @ ewin-business-core ---
+[INFO] [INFO] 
+[INFO] Loading source files for package com.ewin.business.core.service.impl...
+[INFO] Loading source files for package com.ewin.business.core.service...
+[INFO] Loading source files for package com.ewin.business.core...
+[INFO] Constructing Javadoc information...
+[INFO] Standard Doclet version 1.8.0_251
+[INFO] Building tree for all the packages and classes...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/impl/CoreAdminServiceImpl.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/impl/CoreUserServiceImpl.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/ICoreAdminService.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/ICoreUserService.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/CoreBusinessApplication.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/overview-frame.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/package-frame.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/package-summary.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/package-tree.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/package-frame.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/package-summary.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/package-tree.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/impl/package-frame.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/impl/package-summary.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/impl/package-tree.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/constant-values.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/impl/class-use/CoreUserServiceImpl.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/impl/class-use/CoreAdminServiceImpl.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/class-use/ICoreAdminService.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/class-use/ICoreUserService.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/class-use/CoreBusinessApplication.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/package-use.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/package-use.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/com/ewin/business/core/service/impl/package-use.html...
+[INFO] Building index for all the packages and classes...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/overview-tree.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/index-all.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/deprecated-list.html...
+[INFO] Building index for all classes...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/allclasses-frame.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/allclasses-noframe.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/index.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/overview-summary.html...
+[INFO] Generating /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/javadocs/help-doc.html...
+[INFO] [INFO] Building jar: /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/target/ewin-business-core-1.0.2.RELEASE-javadoc.jar
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-install-plugin:3.0.0-M1:install (default-install) @ ewin-business-core ---
+[INFO] [INFO] Installing /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/target/ewin-business-core-1.0.2.RELEASE.jar to /var/jenkins_home/envs/apache-maven-3.6.1/repo/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE.jar
+[INFO] [INFO] Installing /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/pom.xml to /var/jenkins_home/envs/apache-maven-3.6.1/repo/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE.pom
+[INFO] [INFO] Installing /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/target/ewin-business-core-1.0.2.RELEASE-sources.jar to /var/jenkins_home/envs/apache-maven-3.6.1/repo/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE-sources.jar
+[INFO] [INFO] Installing /var/jenkins_home/workspace/ewin/ewin-business/target/checkout/ewin-business-core/target/ewin-business-core-1.0.2.RELEASE-javadoc.jar to /var/jenkins_home/envs/apache-maven-3.6.1/repo/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE-javadoc.jar
+[INFO] [INFO] 
+[INFO] [INFO] --- maven-deploy-plugin:2.8.2:deploy (default-deploy) @ ewin-business-core ---
+[INFO] Uploading to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE.jar
+[INFO] Progress (1): 4.1/7.3 kB
+[INFO] Progress (1): 7.3 kB    
+[INFO]                     
+[INFO] Uploaded to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE.jar (7.3 kB at 120 kB/s)
+[INFO] Uploading to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE.pom
+[INFO] Progress (1): 1.5 kB
+[INFO]                     
+[INFO] Uploaded to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE.pom (1.5 kB at 38 kB/s)
+[INFO] Downloading from nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/maven-metadata.xml
+[INFO] Progress (1): 322 B
+[INFO]                    
+[INFO] Downloaded from nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/maven-metadata.xml (322 B at 18 kB/s)
+[INFO] Uploading to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/maven-metadata.xml
+[INFO] Progress (1): 361 B
+[INFO]                    
+[INFO] Uploaded to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/maven-metadata.xml (361 B at 9.3 kB/s)
+[INFO] Uploading to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE-sources.jar
+[INFO] Progress (1): 4.1/6.1 kB
+[INFO] Progress (1): 6.1 kB    
+[INFO]                     
+[INFO] Uploaded to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE-sources.jar (6.1 kB at 115 kB/s)
+[INFO] Uploading to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE-javadoc.jar
+[INFO] Progress (1): 4.1/62 kB
+[INFO] Progress (1): 8.2/62 kB
+[INFO] Progress (1): 12/62 kB 
+[INFO] Progress (1): 16/62 kB
+[INFO] Progress (1): 20/62 kB
+[INFO] Progress (1): 25/62 kB
+[INFO] Progress (1): 29/62 kB
+[INFO] Progress (1): 33/62 kB
+[INFO] Progress (1): 37/62 kB
+[INFO] Progress (1): 41/62 kB
+[INFO] Progress (1): 45/62 kB
+[INFO] Progress (1): 49/62 kB
+[INFO] Progress (1): 53/62 kB
+[INFO] Progress (1): 57/62 kB
+[INFO] Progress (1): 61/62 kB
+[INFO] Progress (1): 62 kB   
+[INFO]                    
+[INFO] Uploaded to nexus-releases: http://192.168.1.205:8081/repository/maven-releases/com/ewin/ewin-business-core/1.0.2.RELEASE/ewin-business-core-1.0.2.RELEASE-javadoc.jar (62 kB at 656 kB/s)
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] [INFO] Reactor Summary for ewin-business 1.0.2.RELEASE:
+[INFO] [INFO] 
+[INFO] [INFO] ewin-business ...................................... SUCCESS [  3.095 s]
+[INFO] [INFO] ewin-business-core ................................. SUCCESS [  5.845 s]
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] [INFO] BUILD SUCCESS
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] [INFO] Total time:  9.581 s
+[INFO] [INFO] Finished at: 2020-06-08T21:40:49+08:00
+[INFO] [INFO] ------------------------------------------------------------------------
+[INFO] Cleaning up after release...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for ewin-business 1.0.2-SNAPSHOT:
+[INFO] 
+[INFO] ewin-business ...................................... SUCCESS [ 23.295 s]
+[INFO] ewin-business-core ................................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  24.105 s
+[INFO] Finished at: 2020-06-08T21:40:49+08:00
+[INFO] ------------------------------------------------------------------------
++ /var/jenkins_home/envs/apache-maven-3.6.3/bin/mvn deploy
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] ewin-business                                                      [pom]
+[INFO] ewin-business-core                                                 [jar]
+[INFO] 
+[INFO] -----------------------< com.ewin:ewin-business >-----------------------
+[INFO] Building ewin-business 1.0.3-SNAPSHOT                              [1/2]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- maven-enforcer-plugin:3.0.0-M3:enforce (enforce-rules) @ ewin-business ---
+[INFO] 
+[INFO] --- maven-install-plugin:3.0.0-M1:install (default-install) @ ewin-business ---
+[INFO] Installing /var/jenkins_home/workspace/ewin/ewin-business/pom.xml to /var/jenkins_home/envs/apache-maven-3.6.1/repo/com/ewin/ewin-business/1.0.3-SNAPSHOT/ewin-business-1.0.3-SNAPSHOT.pom
+[INFO] 
+[INFO] --- maven-deploy-plugin:2.8.2:deploy (default-deploy) @ ewin-business ---
+Downloading from nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/1.0.3-SNAPSHOT/maven-metadata.xml
+Uploading to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/1.0.3-SNAPSHOT/ewin-business-1.0.3-20200608.134054-1.pom
+Progress (1): 1.9 kB
+                    
+Uploaded to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/1.0.3-SNAPSHOT/ewin-business-1.0.3-20200608.134054-1.pom (1.9 kB at 20 kB/s)
+Downloading from nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/maven-metadata.xml
+Progress (1): 397 B
+                   
+Downloaded from nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/maven-metadata.xml (397 B at 26 kB/s)
+Uploading to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/1.0.3-SNAPSHOT/maven-metadata.xml
+Progress (1): 598 B
+                   
+Uploaded to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/1.0.3-SNAPSHOT/maven-metadata.xml (598 B at 10 kB/s)
+Uploading to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/maven-metadata.xml
+Progress (1): 437 B
+                   
+Uploaded to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business/maven-metadata.xml (437 B at 7.4 kB/s)
+[INFO] 
+[INFO] --------------------< com.ewin:ewin-business-core >---------------------
+[INFO] Building ewin-business-core 1.0.3-SNAPSHOT                         [2/2]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-enforcer-plugin:3.0.0-M3:enforce (enforce-rules) @ ewin-business-core ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:resources (default-resources) @ ewin-business-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ ewin-business-core ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:testResources (default-testResources) @ ewin-business-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ ewin-business-core ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.0.0-M4:test (default-test) @ ewin-business-core ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- maven-jar-plugin:3.2.0:jar (default-jar) @ ewin-business-core ---
+[INFO] Building jar: /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/target/ewin-business-core-1.0.3-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:3.0.0-M1:install (default-install) @ ewin-business-core ---
+[INFO] Installing /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/target/ewin-business-core-1.0.3-SNAPSHOT.jar to /var/jenkins_home/envs/apache-maven-3.6.1/repo/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/ewin-business-core-1.0.3-SNAPSHOT.jar
+[INFO] Installing /var/jenkins_home/workspace/ewin/ewin-business/ewin-business-core/pom.xml to /var/jenkins_home/envs/apache-maven-3.6.1/repo/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/ewin-business-core-1.0.3-SNAPSHOT.pom
+[INFO] 
+[INFO] --- maven-deploy-plugin:2.8.2:deploy (default-deploy) @ ewin-business-core ---
+Downloading from nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/maven-metadata.xml
+Uploading to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/ewin-business-core-1.0.3-20200608.134056-1.jar
+Progress (1): 4.1/7.3 kB
+Progress (1): 7.3 kB    
+                    
+Uploaded to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/ewin-business-core-1.0.3-20200608.134056-1.jar (7.3 kB at 99 kB/s)
+Uploading to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/ewin-business-core-1.0.3-20200608.134056-1.pom
+Progress (1): 1.5 kB
+                    
+Uploaded to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/ewin-business-core-1.0.3-20200608.134056-1.pom (1.5 kB at 14 kB/s)
+Downloading from nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/maven-metadata.xml
+Progress (1): 402 B
+                   
+Downloaded from nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/maven-metadata.xml (402 B at 14 kB/s)
+Uploading to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/maven-metadata.xml
+Progress (1): 776 B
+                   
+Uploaded to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/1.0.3-SNAPSHOT/maven-metadata.xml (776 B at 6.5 kB/s)
+Uploading to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/maven-metadata.xml
+Progress (1): 442 B
+                   
+Uploaded to nexus-snapshots: http://192.168.1.205:8081/repository/maven-snapshots/com/ewin/ewin-business-core/maven-metadata.xml (442 B at 2.4 kB/s)
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for ewin-business 1.0.3-SNAPSHOT:
+[INFO] 
+[INFO] ewin-business ...................................... SUCCESS [  2.763 s]
+[INFO] ewin-business-core ................................. SUCCESS [  2.299 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  6.059 s
+[INFO] Finished at: 2020-06-08T21:40:56+08:00
+[INFO] ------------------------------------------------------------------------
+SSH: Connecting from host [7fa0555e9f6f]
+SSH: Connecting with configuration [Docker Deploy] ...
+SSH: EXEC: STDOUT/STDERR from command [cd /usr/local/docker/ewin/ewin-business/ewin-business-core
+docker build -t ewin-business-core .
+docker tag ewin-business-core:latest 192.168.1.207:80/ewin/ewin-business-core:latest
+docker login 192.168.1.207:80 -u admin -p Harbor12345
+docker push 192.168.1.207:80/ewin/ewin-business-core:latest
+docker image prune -f] ...
+Sending build context to Docker daemon  18.94kB
+
+Step 1/7 : FROM openjdk:8-jre
+ ---> 1c5f6cd937b5
+Step 2/7 : MAINTAINER wh <43654280.qq.com>
+ ---> Using cache
+ ---> 1cc4f859f0f4
+Step 3/7 : ENV APP_VERSION 1.0.2.RELEASE
+ ---> Running in 6112a67abffb
+Removing intermediate container 6112a67abffb
+ ---> 2b472f1a9139
+Step 4/7 : RUN mkdir /app
+ ---> Running in 04ce393e296a
+Removing intermediate container 04ce393e296a
+ ---> f9a8ba6be2a6
+Step 5/7 : COPY ./target/ewin-business-core-$APP_VERSION.jar /app/app.jar
+ ---> 8ffd49f0a3df
+Step 6/7 : ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar", "--spring.profiles.active=prod"]
+ ---> Running in df7a6624dbab
+Removing intermediate container df7a6624dbab
+ ---> ca36388160eb
+Step 7/7 : EXPOSE 8080
+ ---> Running in 81e7d1f754b2
+Removing intermediate container 81e7d1f754b2
+ ---> 7534fcee7e46
+Successfully built 7534fcee7e46
+Successfully tagged ewin-business-core:latest
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+Login Succeeded
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+The push refers to repository [192.168.1.207:80/ewin/ewin-business-core]
+66021f1cdfec: Preparing
+f95aa72f3f83: Preparing
+c7ed915c011c: Preparing
+a8b488a0e334: Preparing
+24ae30bb2901: Preparing
+760e8d95cf58: Preparing
+7cc1c2d7e744: Preparing
+8c02234b8605: Preparing
+760e8d95cf58: Waiting
+7cc1c2d7e744: Waiting
+8c02234b8605: Waiting
+24ae30bb2901: Layer already exists
+a8b488a0e334: Layer already exists
+c7ed915c011c: Layer already exists
+760e8d95cf58: Layer already exists
+7cc1c2d7e744: Layer already exists
+8c02234b8605: Layer already exists
+f95aa72f3f83: Pushed
+66021f1cdfec: Pushed
+latest: digest: sha256:ae009a02205b810796a726b9370af3f6d7b95082bff9d7516560d24e4e62db7e size: 1996
+Deleted Images:
+untagged: 192.168.1.207:80/ewin/ewin-business-core@sha256:60acc4d702d7fe19c14d6a81c73badebbb3d80b869c2ac708c9a2ecf0ea8e9e4
+deleted: sha256:753da9e6ed091c0b41a5a2b2059cc2cfc354ce350737552b07a63314b1fe7fc5
+deleted: sha256:f06fc7cad9bcf798d42865202d69ba660f3ae4b3081a7e0aa0be53948f1b1b18
+deleted: sha256:cb6554e79482547cb326b1c50947b727437161874ccccbd4e0f5fa3cfec5b140
+deleted: sha256:2e8afdcb57a6120b8be3b114ad4e49d899c8a7476d3e3bf52d2e87c1621bbd28
+deleted: sha256:e4af1c941e1b932e0dc22d767a55950813505e1717c45ee6d71243e90f7efc5a
+deleted: sha256:af03d8d603069e87cb88eb7b0934d6efb8466d67d6468a9c80c22d34b9eb2800
+deleted: sha256:e01264fb7b9fa6d5d830012b2c891ec3c76956a1f37a79c064a5b2a27ad0c746
+
+Total reclaimed space: 7.33kB
+SSH: EXEC: completed after 1,804 ms
+SSH: Disconnecting configuration [Docker Deploy] ...
+SSH: Transferred 2 ( 1 + 1 ) file(s)
+Build step 'Send files or execute commands over SSH' changed build result to SUCCESS
+Finished: SUCCESS
