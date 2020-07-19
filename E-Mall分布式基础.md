@@ -284,13 +284,15 @@
 
 3. 安装nodejs，配置npm镜像(已有不需安装，镜像已经配置)，在项目目录下运行`npm install`安装依赖，再运行`npm run dev`
 
-4. 登录管理控制台admin/admin
+4. 登录管理控制台admin/admin，只能使用Chrome
 
 #### 2.使用`renren-generator`生成代码
 
 #### 3.整合mybatis-plus
 
 ## 三、SpringCloud Alibaba
+
+### （一）、Nacos
 
 Nacos :`http://127.0.0.1:8848/nacos`  nacos/nacos
 
@@ -372,7 +374,7 @@ GitHub:`https://github.com/alibaba/spring-cloud-alibaba`
 
 #### Nacos相关概念
 
-##### 一、命名空间
+##### 1、命名空间
 
 配置隔离
 
@@ -389,15 +391,15 @@ spring.cloud.nacos.config.namespace=0c71b54f-c1aa-49de-a66c-68c0419dd9a3
 
 2. 每个微服务之间的相互隔离，每个微服务只加载自己的命名空间下的配置。
 
-##### 二、配置集
+##### 2、配置集
 
 所有配置的集合
 
-##### 三、配置集ID
+##### 3、配置集ID
 
 类似文件名  Data ID
 
-##### 四、配置分组
+##### 4、配置分组
 
 默认所有的配置集都属于：DEFAULT_GROUP;
 
@@ -407,7 +409,7 @@ spring.cloud.nacos.config.group=dev
 
 最佳实践：每个微服务创建自己的命名空间，使用配置分组区分环境dev,test,prod
 
-##### 五、同时加载多个配置集
+##### 5、同时加载多个配置集
 
 1. 微服务任何配置信息，都可以放到配置中心
 
@@ -434,4 +436,326 @@ spring.cloud.nacos.config.group=dev
 
 Nacos官方文档`https://nacos.io/zh-cn/docs/what-is-nacos.html`
 
-#### SpringCloud Gateway
+### （二） 、SpringCloud Gateway
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: baidu_route
+          uri: https://www.baidu.com
+          predicates:
+            - Query=url,baidu
+        - id: qq_route
+          uri: https://www.qq.com
+          predicates:
+            - Query=url,qq
+```
+
+## 四、前端
+
+### ES6新特性
+
+1. let声明变量
+
+2. const声明常量（只读常量）
+
+3. 结构表达式
+
+   ```js
+   // 数组结构
+   let arr = [1,2,3];
+   let [a,b,c] = arr;
+   
+   //对象结构
+   const person = {
+       name: "jack",
+       age: 21,
+       language: ['java','js','css']
+   }
+   const {name,age,language} = person;
+   const {name:abc,age,language} = person; //将name的值赋给abc
+   ```
+
+4. 字符串扩展
+
+   ```js
+   str.startsWith("");
+   str.endsWith("");
+   str.includs("");
+   ```
+
+5. 字符串模板
+
+   ```js
+   let str = `<div>
+   				<span>hello world<span>
+   		   </div>`;
+   ```
+
+6. 字符串插入表达式，变量名写在${}中
+
+   ```js
+   let inf = `我是${name},今年${age}了。`;
+   ```
+
+7. 函数参数默认值
+
+   ```js
+   function add(a,b=1){
+      return a + b;
+   }
+   ```
+
+8. 函数不定参数个数
+
+   ```js
+   function add(...values){
+       return values.length;
+   }
+   ```
+
+9. 箭头函数
+
+   ```js
+   var print = obj => console.log(obj);
+   print("hello");
+   var sum = (a,b) => a+b;
+   sum(1,3);
+   var hello = ({name}) => {}
+   ```
+
+10. 对象优化
+
+    ```js
+    const person = {
+        name: "jack",
+        age: 21,
+        language: ['java','js','css']
+    }
+    Object.keys(person);
+    Object.values(person);
+    Object.entries(person);
+    
+    //assign
+    const target = {a:1};
+    const source1 = {b:2};
+    const source2 = {c:3};
+    Object.assign(target,source1,source2);
+    // target = {a:1,b:2,c:3}
+    
+    // 声明对象简写
+    const name = "jack";
+    const age = 23;
+    const person = {name,age};
+    
+    // 对象的函数属性简写
+    let person = {
+        name: "jack",
+        eat: food => consol.log(person.name + "is eating " + food),
+        eat1: function(food){
+            consol.log(this.name + "is eating " + food)
+        }
+    }
+    
+    // 对象运算符
+    // 拷贝对象（深拷贝）
+    let person = { name:"jack",age:15 }
+    let someone = { ...person }
+    
+    // 合并对象
+    let age = { age: 15 }
+    let name = { name: "jack" }
+    let person = { ...age, ...name }
+    
+    ```
+
+11. map和reduce
+
+    - map()：接收一个函数，将原数组中的所有元素，用这个函数处理后，放入新数组返回
+
+      ```js
+      let arr = [ '1','40','33','11' ];
+      arr = arr.map((item)=>{
+          return item * 2
+      })
+      arr = arr.map(e => e*2)
+      ```
+
+    - reduce()：为数组中的每一个元素依次执行回调函数，不包括数组中被移除或未被赋值的元素
+
+12. promise
+
+13. 模块化
+
+    ```js
+    // user.js
+    var name = "jack"
+    var age = 21
+    export {name,age}
+    
+    // hello.js
+    export const util = {
+        sum(a,b){
+            return a+b
+        }
+    }
+    //export util
+    
+    // main.js 使用导出的模块
+    import {name,age} from "./user.js"
+    import util from "./hello.js"
+    util.sum(1,2)
+    ```
+
+    
+
+## 五、三级分类菜单开发
+
+### （一）前端
+
+1. index.js 修改api请求接口地址
+
+   ```javascript
+   //api接口请求地址 配置emall-gateway的地址
+   window.SITE_CONFIG['baseUrl'] = 'http://localhost:88/api';
+   ```
+
+2. category.vue
+
+   在`views/modules/`下新建`product`文件夹，在文件夹中新建文件catagory.vue
+
+   ```javascript
+     methods: {
+       getMenus() {
+         this.$http({
+           url: this.$http.adornUrl("/product/category/list/tree"),
+           method: "get"
+         }).then(data => {
+             console.log("成功获取菜单数据",data);
+         });
+       }
+     },
+     //vue创建完成，就执行
+     created() {
+         this.getMenus();
+     }
+   ```
+
+### （二）后端
+
+1. emall-gateway
+
+   - 新建跨域配置文件`EmallCorsConfiguration.java`
+
+   ```java
+   @Configuration
+   public class EmallCorsConfiguration {
+   
+       private CorsConfiguration buildConfig() {
+   
+           CorsConfiguration corsConfiguration = new CorsConfiguration();
+   
+           corsConfiguration.addAllowedHeader("*");
+           corsConfiguration.addAllowedOrigin("*");
+           corsConfiguration.addAllowedMethod("*");
+           corsConfiguration.setAllowCredentials(true);
+   
+           return corsConfiguration;
+       }
+   
+       @Bean
+       public CorsWebFilter corsWebFilter() {
+           UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+           source.registerCorsConfiguration("/**", buildConfig());
+           return new CorsWebFilter(source);
+       }
+   }
+   ```
+
+   - application.yml
+
+   ```yaml
+   spring:
+     cloud:
+       gateway:
+         routes:
+           - id: product_route
+             uri: lb://emall-product
+             predicates:
+               - Path=/api/product/**
+             filters:
+               - RewritePath=/api/(?<segment>.*),/$\{segment}
+           - id: admin_route
+             uri: lb://renren-fast
+             predicates:
+               - Path=/api/**
+             filters:
+               - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+   ```
+
+2. renren-fast
+
+   - application.yml
+
+     ```yaml
+      # 配置nacos
+      cloud:
+         nacos:
+           discovery:
+             server-addr: 127.0.0.1:8848
+     ```
+
+   - 启动类加上服务注册注解
+
+     ```java
+     @EnableDiscoveryClient
+     @SpringBootApplication
+     public class RenrenApplication {
+     ```
+
+3. emall-product
+
+   - bootstrap.properties
+
+     ```properties
+     spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+     spring.application.name=emall-product
+     spring.cloud.nacos.config.namespace=product_ns
+     ```
+
+   - Nacos创建ID为`product_ns`的命名空间
+
+   - application.yml
+
+     ```yaml
+       cloud:
+         nacos:
+           discovery:
+             server-addr: 127.0.0.1:8848
+     ```
+
+4. 逻辑删除
+
+   - application.yml
+
+     ```yaml
+     mybatis-plus:
+       global-config:
+         db-config:
+           logic-delete-value: 1
+           logic-not-delete-value: 0
+     ```
+
+   - Entity
+
+     ```java
+     	/**
+     	 * 是否显示[0-不显示，1显示]
+     	 */
+     	@TableLogic(value = "1",delval = "0")
+     	private Integer showStatus;
+     ```
+
+     
