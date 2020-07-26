@@ -643,6 +643,12 @@ spring:
      }
    ```
 
+3. vscode设置代码片段模板
+
+   `文件`->`首选项`->`代码片段`
+
+   
+
 ### （二）后端
 
 1. emall-gateway
@@ -758,4 +764,60 @@ spring:
      	private Integer showStatus;
      ```
 
-     
+## 六、API品牌管理
+
+### OSS云存储
+
+阿里云注册OSS云存储，在`emall-common`工程里导入阿里云存储依赖
+
+前端校验，是校验用户输入的内容。
+
+后端校验，是校验PostMan的输入内容，防止受到攻击。
+
+### JSR303后端校验
+
+### 统一的异常处理 ControllerAdvice
+
+1. 编写异常处理类，使用@ControllerAdvice注解
+2. 使用@ExceptionHandler标注方法可以处理的异常
+
+#### 错误列表枚举类
+
+错误码列表，例如10001等
+
+10：通用
+
+​	001：参数格式化校验
+
+11：商品
+
+12：订单
+
+13：购物车
+
+14：物流
+
+#### 自定义校验
+
+1. 编写一个自定义的校验注解
+
+2. 编写一个自定义的校验器，实现`ConstraintValidator`接口
+
+   可以指定多个校验器
+
+   ```java
+   @Constraint(validatedBy = {ListValueConstraintValidator.class})
+   ```
+
+3. 关联自定义的校验器和自定义的校验注解
+
+接口文档 `https://easydoc.xyz/#/s/78237135`
+
+## 七、API属性分组
+
+子组件通过事件，向父组件传递数据。`emit`
+
+如果Json的属性是空的话，不写入Json，使用`@JsonInclude(JsonInclude.Include.NON_EMPTY)`注解
+
+引入分页插件`PaginationInterceptor`
+
