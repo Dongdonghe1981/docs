@@ -1414,13 +1414,13 @@ nested是属性里包含子属性
 
 ```
 
-Feign调用流程
+#### Feign调用流程
 
 1. 构造请求数据，将对象转为json
 2. 发送请求，执行成功，解码相应数据
 3. 执行请求会有重试机制，可以设置是否重试和重试次数。
 
-动静分离
+#### 动静分离
 
 静：图片，JS，CSS等静态资源（以实际文件存在的方式）
 
@@ -1428,7 +1428,7 @@ Feign调用流程
 
 每个微服务都可以独立部署、运行、升级，独立自治，独立DB；技术、架构、业务
 
-模板引擎thymeleaf
+#### 模板引擎thymeleaf
 
 1. thymeleaf-starter:关闭缓存
 
@@ -1438,7 +1438,7 @@ Feign调用流程
 
    spring-boot，访问项目的时候，默认会找index.html    `WebMvcAutoConfiguration.java`
 
-devtools
+#### devtools
 
 1. 引入devtools
 
@@ -1452,7 +1452,7 @@ devtools
 
 2. 修改完页面，controller shift f9重新自动编译页面，如果代码配置修改，还是建议重启
 
-nginx配置
+#### nginx配置
 
 1. windows主机的host文件`192.168.137.10 emall.com `
 
@@ -1474,7 +1474,7 @@ nginx配置
    :
    ```
 
-nginx的负载均衡配置
+#### nginx的负载均衡配置
 
 1. 配置上流服务
 
@@ -1520,7 +1520,7 @@ nginx的负载均衡配置
    
    ```
 
-压力测试
+#### 压力测试
 
 性能指标
 
@@ -1554,5 +1554,68 @@ nginx的负载均衡配置
 
 互联网小型网站：500 ~ 10000
 
-修改windows端口访问
+修改windows端口访问，提高端口刷新频率
 
+visualvm解决插件无法更新
+
+1. 查看jdk版本号.javar -version
+
+2. `http://visualvm.github.io/pluginscenters.html`
+3. 安装visual gc插件
+
+docker stats监控各个容器的运行情况
+
+压测时，nginx主要CPU指标提高，内存基本没有变化。
+
+| 压测内容                                                     | 压测线程数 | 吞吐量 | 90%相应时间 | 99%相应时间 | URL                                       |
+| ------------------------------------------------------------ | ---------- | ------ | ----------- | ----------- | ----------------------------------------- |
+| nginx                                                        | 50         | 2335   | 11          | 944         |                                           |
+| Gateway                                                      | 50         | 10367  | 8           | 31          |                                           |
+| 简单商品服务hello                                            | 50         | 11134  | 8           | 17          | http://192.168.137.1:10000/hello端口10000 |
+| Gateway<br>+简单商品服务hello                                | 50         | 4400   | 30          | 125         | http://localhost:88/hello 端口：88        |
+| nginx+Gateway+<br>简单商品服务hello                          | 50         | 700    | 27          | 44          | http://emall.com/hello     端口80         |
+| 首页一级菜单                                                 | 50         | 270    | 267         | 367         | http://localhost:10000/                   |
+| 首页一级菜单（缓存开）                                       | 50         | 290    | 251         | 365         |                                           |
+| 首页一级菜单（缓存开，日志调低，DB加索引）                   | 50         | 735    | 105         | 183         |                                           |
+| 三级分类                                                     | 50         | 2      | 12014       | 12482       | http://localhost:10000/index/catalog.json |
+| 三级分类（缓存开，日志调低，DB加索引）                       | 50         | 7      |             |             |                                           |
+| 三级分类（缓存开，日志调低，DB加索引，一次DB全表检索，java过滤） | 50         | 113    | 571         | 896         |                                           |
+| 首页全量数据<br>图片，CSS，Js等                              | 50         | 7      |             |             |                                           |
+| 首页全量数据<br/>动静分离                                    | 50         | 13     |             |             |                                           |
+| 首页全量数据<br/>动静分离+JVM options<br>-Xmx1024m -Xms1024m -Xmn512m(指定新生代（Eden+S1+S2）) | 200        | 15     |             |             |                                           |
+
+- 中间件越多，性能损失越大，大多都损失在网络交互了
+
+- 首页一级菜单：慢的原因：DB查询和thymeleaf渲染
+
+- 三级分类：慢的原因：DB查询
+- 业务
+  - DB ，模板的渲染速度（缓存开关），静态资源
+
+#### nginx动静分离
+
+1. 以后将所有项目的静态资源都应该放在nginx里面 
+
+2. 规则：/static/**所有请求都由nginx直接返回
+
+3. nginx虚拟机上创建`/mydata/nginx/html/static`目录，将product工程下的static里的index目录拷贝到创建的目录下，删除工程下的目录
+
+4. 修改templates/index.html的静态资源href，在前面加上static(使用ctrl+r进行替换)
+
+   - href="  -> href="/static/
+
+   - <script src=" -> <script src="/static/
+
+   - <img src=" - > <img src="/static/
+
+5. 修改nginx的emall.conf，然后重启docker restart nginx
+
+   ```nginx
+   location /static/ {
+       root /usr/share/nginx/html;  
+       #root指所有请求都到哪个文件夹下匹配,该目录是nginx容器内的目录，实际static是在被挂载的目录
+       #-v /mydata/nginx/html:/usr/share/nginx/html \
+   }
+   ```
+
+6. chrome -> F12 -> Network -> Disable cache 不缓存数据
