@@ -1567,6 +1567,22 @@ docker stats监控各个容器的运行情况
 
 压测时，nginx主要CPU指标提高，内存基本没有变化。
 
+使用JMeter
+
+创建
+
+TestPlan
+
+​    线程组
+
+​         HTTP请求
+
+   	  查看结果树
+
+​         汇总报告
+
+​         聚合报告
+
 | 压测内容                                                     | 压测线程数 | 吞吐量 | 90%相应时间 | 99%相应时间 | URL                                       |
 | ------------------------------------------------------------ | ---------- | ------ | ----------- | ----------- | ----------------------------------------- |
 | nginx                                                        | 50         | 2335   | 11          | 944         |                                           |
@@ -1580,6 +1596,7 @@ docker stats监控各个容器的运行情况
 | 三级分类                                                     | 50         | 2      | 12014       | 12482       | http://localhost:10000/index/catalog.json |
 | 三级分类（缓存开，日志调低，DB加索引）                       | 50         | 7      |             |             |                                           |
 | 三级分类（缓存开，日志调低，DB加索引，一次DB全表检索，java过滤） | 50         | 113    | 571         | 896         |                                           |
+| 三级分类（缓存开，日志调低，DB加索引，一次DB全表检索，java过滤，Redis缓存） | 50         | 411    | 153         | 217         |                                           |
 | 首页全量数据<br>图片，CSS，Js等                              | 50         | 7      |             |             |                                           |
 | 首页全量数据<br/>动静分离                                    | 50         | 13     |             |             |                                           |
 | 首页全量数据<br/>动静分离+JVM options<br>-Xmx1024m -Xms1024m -Xmn512m(指定新生代（Eden+S1+S2）) | 200        | 15     |             |             |                                           |
@@ -1619,3 +1636,416 @@ docker stats监控各个容器的运行情况
    ```
 
 6. chrome -> F12 -> Network -> Disable cache 不缓存数据
+
+## 缓存与分布式锁
+
+### 缓存使用
+
+为了系统性能提升，一般都会将部分数据写入缓存中，加速访问。而DB承担数据持久化工作。
+
+哪些数据适合放入缓存？
+
+1. 及时性、数据一致性要求不高（比如物流信息、商品分类信息）
+2. 访问量大，且更新频率不高（读多写少）比如商品信息
+
+读模式缓存使用流程
+
+1. 请求，读取缓存中数据，如果命中，就返回结果
+
+2. 如果没命中，查询数据库，将数据放入缓存，返回结果
+
+   ```java
+   data = cache.load(id);
+   if(data == null){
+       data=db.load(id);
+       cache.put(id,data);
+   }
+   return data;
+   ```
+
+分布系统，不适合使用本地缓存，会产生重复查询DB和缓存不一致问题。
+
+使用内存中间件，如redis
+
+整合redis
+
+1. 在pom里引入`spring-boot-starter-data-redis`
+
+2. 在application.yml里配置redis的host信息
+
+3. 使用Springboot自动配置好的StringRedisTemplate来操作redis
+
+   ```
+   缓存中是数据，都是json字符串，跨语言，跨平台
+   ```
+
+大量并发时，redis出现InternalOutOfDirectMemoryError（堆外内存溢出）异常
+
+direct memory是堆外内存，直接操作内存条。 
+
+springboot2.0默认使用lettcue作为操作redis的客户端，它使用netty进行网络通信。lettcue的bug。
+
+如果没有指定堆外内存，就会使用JVM的-Xmx内存，可以通过-Dio.netty.maxDirectMemory设置。
+
+解决方案：不能使用设置去调大内存。
+
+1. 升级lettuce客户端
+2. 切换使用jedis
+
+#### 缓存穿透
+
+同一查询请求，如果缓存中没有，则都访问DB，DB压力瞬增 。
+
+解决方法：第一次查询即使是null结果，也写入缓存，并加入短暂过期时间。不然的话，一直从缓存中得到null结果。
+
+#### 缓存雪崩
+
+设置缓存时采用的相同的过期时间，导致大量 缓存同时失效，请求全部转到DB。
+
+解决方案：在原有失效的时间基础上，加一个随机值。
+
+#### 缓存击穿
+
+某个热点key在大量请求前，失效，那么大量请求都查询DB
+
+解决方案：加锁，大量并发，只让一个去查询，其他等待，查到以后释放锁。其他请求获取到锁，先查缓存，就会有数据，不查询DB。
+
+#### 本地锁
+
+用synchronized定义查询方法，或者使用ReentrantLock。所有的组件在springboot容器中是单例的，因此可以锁住单一对象。
+
+```java
+Lock lock = new ReentrantLock() ;    
+lock.lock();
+try {
+    cataLogJsonFromDb = getCataLogJsonFromDb();
+    redis.opsForValue().set("cataLogJson", JSON.toJSONString(dbjson), 1, TimeUnit.DAYS);
+}catch (Exception e){
+    log.error(e.getMessage());
+}finally {
+    lock.unlock();
+}
+```
+
+```java
+synchronized (this){//this是当前对象，确保对象唯一，就是一把锁，是OK的
+    data = getCataLogJsonFromDb();
+    redis.opsForValue().set("cataLogJson", JSON.toJSONString(data), 1, TimeUnit.DAYS);
+}
+```
+
+
+
+在分布式情况下，本地锁，只能锁住当前服务器的当前进程，不能锁住其他服务器的进程，因此必须使用分布式锁，但效率低。
+
+模拟分布式：把Services中把当前的产品服务拷贝一份，在Program arguments:中设置--server.port=10001，多拷贝几个，启动服务，可以在nacos中看到服务列表的实例数。JMeter里设置为给Nginx发送请求emall.com，端口80
+
+分布式锁，代码
+
+```java
+String uuid = UUID.randomUUID().toString();
+Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid ,300,TimeUnit.SECONDS);
+if (lock){
+    try {
+        Map<String, List<Catelog2Vo>> cataLogJsonFromDb = getCataLogJsonFromDb();
+    }finally {
+        String luaScript = "if redis.call('get',KEYS[1]) == ARGV[1] then  return redis.call('del',KEYS[1]) else return 0 end";
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>(luaScript, Long.class);
+        //删除锁，保证原子性
+        Long lock1 = stringRedisTemplate.execute(script, Arrays.asList("lock"), uuid);
+    }
+    //加锁成功，检索DB
+    return getCataLogJsonFromDb();
+}else{
+    return getCataLogJson();
+}
+```
+
+#### Redisson 分布式锁框架
+
+`https://github.com/redisson/redisson/wiki/Table-of-Content`
+
+1. 引入依赖
+
+```
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.12.5</version>
+        </dependency>
+```
+
+2. 配置Redisson
+
+   ```java
+   public class MyRedissonConfig {
+   
+       @Bean(destroyMethod="shutdown")
+       public RedissonClient redisson() throws IOException {
+           Config config = new Config();
+   		config.useSingleServer().setAddress("redis://192.168.137.10:6379");
+           return Redisson.create(config);
+       }
+   }
+   ```
+
+   可重入锁：A方法调用B方法，A对资源加了lock1，B也要对相同的资源加lock1，但A已经加了，B就可以拿来用了，B执行完，A执行完释放lock1。避免引起死锁。所有的锁都应该设计为可重入锁。
+
+   可重入就是说某个线程已经获得某个锁，可以再次获取锁而不会出现死锁。
+
+3.使用redisson，默认加锁30秒
+
+```java
+        // 获取一把锁，只要名字一样，就是同一把锁
+        RLock mylock = redisson.getLock("mylock");
+        mylock.lock();
+        try{
+            System.out.println("业务代码");
+        }finally {
+            mylock.unlock();
+        }
+```
+
+redisson解决了两个问题
+
+- 自动续期，如果锁业务超长，运行期间自动给锁续上新的30秒，不用担心过期的问题。
+- 加锁的业务运行完成，不会给锁续期，即使不手动解锁，默认30秒以后自动删除。
+
+读写锁
+
+写锁是一个排他锁，读锁是共享锁，写锁没释放，读必须等待
+
+- 写 + 读：等待写锁释放
+
+- 写 + 写：阻塞方式
+
+- 读 + 写：有读锁，写需要等待
+
+- 读 + 读：相当于无锁，并发读，只会在redis记录好当前的读锁，会同时加锁成功
+
+  只要有写的存在，都必须等待
+
+信号量
+
+使用场景：停车场有多个车位，当都停满的时候，新车停不进来，当走了一辆以后，新车才可以进来。
+
+```java
+    @GetMapping("/park")
+    @ResponseBody
+    public String park() throws InterruptedException {
+        RSemaphore park = redisson.getSemaphore("park");
+        //park.acquire();//获取一个信号，是阻塞
+        boolean b = park.tryAcquire();//尝试获取一个信号，不是阻塞
+        return "ok=>"+b;
+    }
+
+    @GetMapping("/leave")
+    @ResponseBody
+    public String leave(){
+        RSemaphore park = redisson.getSemaphore("park");
+        park.release();//释放信号，也是阻塞
+        return "ok";
+    }
+```
+
+信号量也可以用作系统的限流，控制每秒最大访问量。
+
+闭锁（CountDownLatch）
+
+跟java闭锁相似。
+
+使用场景：学校放假，锁大门。所有班级学生都离开，才可以锁大门。
+
+```java
+    @GetMapping("/lockDoor")
+    @ResponseBody
+    public String lockDoor() throws InterruptedException {
+        RCountDownLatch door = redisson.getCountDownLatch("door");
+        door.trySetCount(5);
+        door.await();//等待闭锁都完成，阻塞
+
+        return "ok";
+    }
+
+    @GetMapping("/left/{id}")
+    @ResponseBody
+    public String left(@PathVariable("id") Long id){
+        RCountDownLatch door = redisson.getCountDownLatch("door");
+        door.countDown();
+        return id+" Class left";
+    }
+```
+
+缓存一致性问题
+
+解决方案：
+
+1. 双写模式：数据更新的同时，更新缓存
+
+2. 失效模式：数据更新的同时，删除缓存
+
+   本系统的一致性解决方案： 
+
+   1、缓存的所有数据都有过期时间，数据过期下一次查询触发主动更新 
+
+   2、读写数据的时候，加上分布式的读写锁。 经常写，经常读
+
+## SpringCache
+
+官网：`https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#cache`
+
+```
+主要的注解，一定要加到serverImpl类的@Override方法上
+@Cacheable: 触发保存缓存的操作
+@CacheEvict: 触发将数据从缓存中删除，失效模式
+@CachePut: 不影响方法执行，更新缓存，双写模式
+@Caching: 组合以上多个操作
+@CacheConfig: 在一个类中，共享缓存的相同配置
+```
+
+### 整合SpringCache，简化缓存开发
+
+1. 引入依赖
+
+   ```xml
+           <dependency>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-cache</artifactId>
+           </dependency>
+   ```
+
+2. 写配置
+
+   已经完成的自动配置
+
+   - CacheAutoConfiguration会导入RedisCacheConfiguration，自动配好了RedisCacheManager
+
+   - 配置使用redis作为缓存
+
+     ```properties
+     spring.cache.type=redis
+     ```
+
+### 测试缓存
+
+- 开启缓存功能 `@EnableCaching`在Application类中。
+
+- @Cacheable，代表当前方法的结果需要被缓存，如果缓存中有，该方法都不需要被调用，如果没 有，该方法会被执行，将结果放入缓存。
+
+- 每一个需要缓存的数据，都要指定要放入哪个名字的缓存中【缓存分区（按业务类型分）】。
+
+  ```
+  @Cacheable({"category"})
+  ```
+
+- 默认行为
+  - key是默认生成的，缓存的名字::SimpleKey []
+  - 缓存的Value值，默认使用jdk序列化机制，将序列化后的数据存入redis
+  - 默认时间是TTL=-1，永不过期。
+
+- 将默认行为，修改为自定义行为
+
+  - 指定缓存的key，使用key属性，接收一个spEL
+
+    ```java
+    @Cacheable(value = {"category"},key = "#root.methodName")
+    ```
+
+  - 指定缓存过期时间，在配置文件中个修改，以毫秒为单位
+
+    ```properties
+    spring.cache.redis.time-to-live=3600000
+    #缓存key的前缀，如果指定，就使用，否则使用缓存名字。
+    #使用分区名作为前缀，这样可以按分区删除
+    spring.cache.redis.key-prefix=CACHE_ 
+    spring.cache.redis.use-key-prefix=true
+    #是否缓存空值，防止穿透
+    spring.cache.redis.cache-null-values=true
+    ```
+
+  - 将数据保存为Json，将RedisCacheConfiguration注入到Spring容器中，修改默认配置。
+
+    ```java
+    @EnableConfigurationProperties(CacheProperties.class)
+    @Configuration
+    @EnableCaching
+    public class MyCacheConfig {
+    
+        @Bean
+        RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties){
+    
+            RedisCacheConfiguration config  = RedisCacheConfiguration.defaultCacheConfig();
+            config = config.entryTtl(Duration.ofMinutes(5));
+    
+            CacheProperties.Redis redisProperites = cacheProperties.getRedis();
+            if(!redisProperites.isCacheNullValues()){
+                config =config.disableCachingNullValues();
+            }
+            
+    
+            config = config.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
+            config = config.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+    
+            return config;
+        }
+    }
+    ```
+
+    
+
+- 原理
+
+  CacheAutoConfiguration -> RedisCacheConfiguration -> RedisCacheManager -> 初始化所有的缓存 -> 每个缓存决定使用什么配置，已有的就用，没有就使用默认的。如果想改缓存配置，给容器中放入一个RedisCacheConfiguration 类，就会应用到当前的缓存管理器。
+
+- 数据更新，缓存自动失效
+
+  ```java
+  @CacheEvict(value={"category"},key = "'getLevel1Categorys'")
+  ```
+
+- 同时进行多次缓存操作
+
+  ```java
+      @Caching(evict = {
+              @CacheEvict(value={"category"},key = "'getLevel1Categorys'"),
+              @CacheEvict(value={"category"},key = "'getCataLogJson'")
+      })
+  ```
+
+  也可以删除分区下所有的key
+
+  ```java
+  @CacheEvict(value={"category"},allEntries = true)
+  ```
+
+### SpringCache的不足
+
+### 读模式
+
+1. 缓存穿透
+
+   解决方案：默认配置cache-null-value=true
+
+2. 缓存击穿
+
+   默认是不加锁的，可以使用sync=true，防止击穿，这是本地锁，不是分布式锁。
+
+   ```java
+   @Cacheable(value = {"category"},key = "#root.methodName",sync=true)
+   ```
+
+3. 缓存雪崩
+
+   解决方案：不是超大型项目，不会出现大量的缓存同时过期，因为存储缓存的时间也不同。默认配置spring.cache.redis.time-to-live=3600000
+
+### 写模式
+
+1. 读写加锁
+2. 引入canal，感知mysql的更新去更新缓存
+3. 读多写多，直接去DB查询
+
+### 总结
+
+读多写少，及时性一致性要求不高的数据，完全可以使用SpringCache；写模式，只要缓存有过期时间，就可以了。
+
+特殊数据：需要特殊设计
