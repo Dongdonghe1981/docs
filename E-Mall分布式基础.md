@@ -2049,3 +2049,429 @@ redisson解决了两个问题
 读多写少，及时性一致性要求不高的数据，完全可以使用SpringCache；写模式，只要缓存有过期时间，就可以了。
 
 特殊数据：需要特殊设计
+
+## CompletableFuture异步编排
+
+无
+
+## SpringMVC视图映射
+
+不必通过Controller跳转，默认只支持get
+
+```java
+@Configuration
+public class EmallWebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry){
+        registry.addViewController("/login.html").setViewName("login");
+        registry.addViewController("/reg.html").setViewName("reg");
+    }
+}
+```
+
+## 使用阿里云短信服务
+
+在阿里云->云市场->短信，购买短信服务
+
+APPCODE在云市场->已购买的服务找到APPCODE
+
+请求Header中添加的Authorization字段；配置Authorization字段的值为“APPCODE ＋ 半角空格 ＋APPCODE值”。
+例：Authorization:APPCODE 3F2504E04F8911D39A0C0305E82C3301
+
+### 绑定配置文件
+
+```java
+@ConfigurationProperties(prefix = "spring.cloud.alicloud.sms")
+@Data
+@Component
+public class SmsComponent {
+
+    private String host;
+    private String path;
+    private String appcode;
+```
+
+```yaml
+spring:
+  cloud:
+    alicloud:
+      sms:
+        host: https://zwp.market.alicloudapi.com
+        path: /sms/sendv2
+        appcode: 45c3abc99aa04bae9ff74c1c38e0cefa
+```
+
+```js
+$(function(){
+    $("#sendCode").click(function(){
+        if ( $(this).hasClass("disabled") ) return;
+        //发送验证码
+        $.get("/sms/sendCode?phone="+$("#phoneNum").val(),function(data){
+            if(data.code !=0 ){
+                alert(data.msg);
+            }
+        });
+        //倒计时
+        timeoutChangeStyle();
+    });
+})
+var num = 10;
+function timeoutChangeStyle() {
+    $("#sendCode").attr("class","disabled");
+    if ( num == 0 ){
+        $("#sendCode").text("发送验证码");
+        num = 10;
+        $("#sendCode").attr("class","");
+    }else {
+        var str = num + "s 后再次发送";
+        $("#sendCode").text(str);
+        setTimeout("timeoutChangeStyle()", 1000);
+        num--;
+    }
+}
+```
+
+
+
+## 用户注册
+
+Controller
+
+```java
+
+    @PostMapping("/regist")
+    public String regist(@Valid UserRegistVo vo, BindingResult result, RedirectAttributes redirectAttributes){
+
+        if(result.hasErrors()){
+            Map<String,String> errors = result.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            redirectAttributes.addFlashAttribute("errors",errors);
+            //校验出错，回到注册页
+            return "redirect:http://auth.emall.com/reg.html";
+        }
+        //真正注册，调用远程服务
+        //注册成功回登录页
+        return "redirect:http://auth.emall.com/login.html";
+    }
+```
+
+#### 微博登录
+
+https://open.weibo.com/wiki/Connect/login
+
+- App Key：2350946709
+
+- App Secret：a989fd1f900ad1f2d16bc3c3b8680765
+
+换取的code码，只能换取一次access token，之后失效。
+
+换取后的access token一段时间有效，以后通过携带access token可以访问远程资源服务器开放的所有api，通过api得到用户相关信息，并保存到本系统的数据库中，包括access token。
+
+### 分布式session
+
+不同的域名，不共享session。比如auth.emall.com和emall.com。
+
+分布式环境下，即使同一服务，在不同的服务器上，session也会不同步。
+
+#### 解决方案
+
+1. session复制
+2. 客户端存储
+3. hash一致性   √
+4. 统一存储 √   SpringSession
+
+#### 子域session共享  
+
+不同服务，子域session共享  
+
+jsessionid这个cookie默认是当前系统域名的。当我们分拆服务，不同域名部署的时候，我们可以设置Cookies的作用域为指定的父域名，即使子域名设置Cookies的时候，也能让父域名直接使用，这样就可以让浏览器跨不同的微服务，可以通用，而session内容又统一存储到redis中，就可以解决session共享和子域session共享问题。
+
+父域名：emall.com
+
+子域名：auth.emall.com ,  order.emall.com
+
+### SpringSession
+
+整合SpringSession
+
+1. application.properties
+
+   ```properties
+   spring.session.store-type=redis
+   server.servlet.session.timeout=30m
+   ```
+
+2. 注解
+
+   ```java
+   @EnableRedisHttpSession
+   ```
+
+使用SpringSession
+
+1. 设置session存储的数据
+
+   ```java
+   session.setAttribute("loginUser",data);
+   ```
+
+2. 页面获取session数据
+
+   ```html
+   <a href="http://auth.emall.com/login.html" th:text="${session.loginUser == null ? '你好，请登录' : '你好:'+session.loginUser.username}"></a>
+   ```
+
+3. 配置redis存储json，而不是序列化后的ASC码，设置session的跨域
+
+   ```java
+   @Configuration
+   public class EmallSessionConfig {
+   
+       @Bean
+       public CookieSerializer cookieSerializer() {
+           DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+           serializer.setDomainName("emall.com");//设置session作用域，放大到父域
+           serializer.setCookieName("EMALLSESSIONID");
+           return serializer;
+       }
+   
+       @Bean
+       public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
+           return new GenericFastJsonRedisSerializer();
+           //redis存储json
+       }
+   }
+   ```
+
+   该配置类要放到auth和product工程中，不能放到common中，否则无效。
+
+### 单点登录
+
+单点登录框架`https://gitee.com/xuxueli0323/xxl-sso?_from=gitee_search`
+
+1. 中央认证服务器：ssoserver.com
+2. 其他系统，想要登录去ssoserver.com登录，登录成功跳转回来
+3. 只要有一个系统登录，其他都不需要登录
+4. 全系统统一一个唯一标识cookies，所有系统域名可能都不相同
+
+实现核心
+
+1. 给登录服务器留下登录痕迹，即Cookies
+
+2. 登录服务器要将token信息重定向的时候，带上url，服务器将uuid作为key，用户信息作为value存储到redis中
+
+3. 其他系统要处理url地址上的关键token，只要有，带上token向服务器发请求，服务器接到请求后，用token从redis中得到对应的用户信息，返回给系统，系统得到用户信息后，保存在自己的session中。
+
+4. cookies不能跨浏览器
+
+## 购物车
+
+浏览器有一个cookie:user-key:标识用户身份，一个月后到期
+如果第一次使用购物车功能，都会给用户一个临时身份
+浏览器以后保存，每次访问都会带上这个cookie
+登录的话，session里有
+没登录，按照cookie里面带的user-key来做
+第一次如果没有临时用户，需要创建一个临时用户。
+
+ThreadLocal 同一线程共享数据 原理：Map<ThreadId,Object>
+
+Interceptor -> Controller -> service -> dao都是同一个线程
+
+创建拦截器
+
+```java
+@Component
+public class CartInterceptor implements HandlerInterceptor {
+    public static  ThreadLocal<UserInfoTo> threadLocal = new ThreadLocal<>();
+
+    /**
+     * 目标方法执行之前拦截
+     */
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                threadLocal.set(userInfoTo);
+    }
+     /**
+     * 业务执行之后
+     */
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        UserInfoTo userInfoTo = threadLocal.get();
+
+        if( !userInfoTo.isTempUser()) {
+            //创建Cookie name：value
+            Cookie cookie = new Cookie(CartConstant.TEMP_USER_COOKIE_NAME, userInfoTo.getUserKey());
+            //设置作用域
+            cookie.setDomain("emall.com");
+            cookie.setMaxAge(CartConstant.TEMP_USER_COOKIE_TIMEOUT);//设置过期时间
+            response.addCookie(cookie);
+        }
+    }
+```
+
+配置拦截器
+
+```java
+@Configuration
+public class EmallWebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new CartInterceptor())
+                .addPathPatterns("/**");
+    }
+}
+```
+
+多线程调用远程接口
+
+```java
+@Autowired
+ThreadPoolExecutor executor;
+
+CompletableFuture<Void> skuInfoTask = CompletableFuture.runAsync(() -> {
+    //远程查询要添加的商品信息
+    R r = productFeignService.getSkuInfo(skuId);
+    SkuInfoVo skuInfo = r.getData("skuInfo", new TypeReference<SkuInfoVo>() {
+    });
+},executor);
+
+CompletableFuture.allOf(skuInfoTask).get();
+```
+
+将线程池注入到spring容器
+
+```java
+@Configuration
+public class MyThreadConfig {
+    @Bean
+    public ThreadPoolExecutor threadPoolExecutor(ThreadPoolConfigProperties pool){
+        return new ThreadPoolExecutor(
+                pool.getCoreSize(),
+                pool.getMaxSize(),
+                pool.getKeepAliveTime(),
+                TimeUnit.SECONDS,new LinkedBlockingDeque<>(100000),
+                Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.AbortPolicy()
+        );
+    }
+}
+```
+
+避免购物车重复添加
+
+解决方案：通过添加完购物车，重定向到一个查询的URL，这样每次页面刷新，都是查询操作。
+
+RedirectAttributes.addFlashAttribute()   将数据放到session，只能取得一次。
+
+RedirectAttributes.addAttribute()   将数据放到url后面。
+
+```java
+    @PostMapping("/addToCart")
+    public String addToCart(@RequestParam("skuId") Long skuId,
+                            @RequestParam("num") Integer num,
+                            RedirectAttributes ra) throws  {
+
+        cartService.addToCart(skuId,num);
+        ra.addAttribute("skuId",skuId);
+        return "redirect:/addToCartSuccess.html";
+    }
+
+    @GetMapping("/addToCartSuccess.html")
+    public String addToCartSuccessPage(@RequestParam("skuId") Long skuId,Model model){
+        CartItem item = cartService.getCartItem(skuId);
+        model.addAttribute("item",item);
+
+        return "success";
+    }
+```
+
+动态改变购物车的商品选择，更新到redis
+
+```html
+//定义一个skuId属性，并赋值
+<li><input type="checkbox" th:attr="skuId=${item.skuId}" class="itemCheck" th:checked="${item.check}"></li>
+```
+
+```javascript
+    $(".itemCheck").click(function(){
+        var skuId = $(this).attr("skuId");
+        var check = $(this).prop("checked");
+        location.href="http://cart.emall.com/checkItem?skuId="+skuId+"&check="+(check?1:0);
+    })
+```
+
+```java
+    @GetMapping("/checkItem")
+    public String checkItem(@RequestParam("skuId") Long skuId,@RequestParam("check") Integer check){
+        cartService.checkItem(skuId,check);
+        return "redirect:http://cart.emall.com/cartList.html";
+    }
+```
+
+## RabbitMQ
+
+>  是一个专门做队列的框架，在队列方面要比redies队列性能要好，支持的功能会更多，消息的可靠性更强，可以根据路由规则去选择进入哪一个队列，做到更加细致的消息分发，同是可以做到消息响应，当处理一个比较耗时得任务的时候，也许想知道消费者（consumers）是否运行到一半就挂掉。在当前的代码中，当RabbitMQ将消息发送给消费者（consumers）之后，马上就会将该消息从队列中移除。此时，如果把处理这个消息的工作者（worker）停掉，正在处理的这条消息就会丢失。同时，所有发送到这个工作者的还没有处理的消息都会丢失。
+
+应用场景
+
+1. 异步处理
+2. 应用解耦
+3. 流量控制
+
+消息代理（message broker）和目的地（destination）
+
+当消息发送者发送消息以后，将由消息代理接管，消息代理保证消息传递到指定目的地。
+
+消息目的地
+
+1. 队列（queue）：点对点消息通信（point-to-point）
+2. 主题（topic）：发布（publish）/订阅（subscribe）消息通信
+
+点对点：消息只有唯一的发送者和接收者，但不能说只有一个接收者。
+
+发布订阅：发送者发送消息到主题，多个接收者监听这个主题，那么就会在消息到达时同时收到消息。
+
+JMS（Java Message Service ）
+
+定义Java api层面的标注，在Java体系中，多个client均可以通过JMS进行交互，不需要应用修改代码，但对跨语言支持较差。ActiveMQ作为实现者。
+
+AMQP（Advanced Message Queue Protol）
+
+使用json作为传输对象，具有跨平台、跨语言的特性。RabitMQ
+
+#### Docker安装RabbitMQ
+
+官方文档`https://www.rabbitmq.com/networking.html`
+
+```
+docker run -d --name rabbitmq -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 25672:25672 -p 15671:15671 -p 15672:15672 rabbitmq:management
+#开机自动启动
+docker update rabbitmq --restart=always
+#控制台
+http://192.168.137.10:15672/
+guest/guest
+```
+
+Exchange类型
+
+direct:路由键与队列名完全匹配。单播模式或点对点模式
+
+fanout（扇出）:广播类型或发布订阅模式，不关心路由键，消息被转发到与该交换机绑定的所有队列。
+
+topic:将路由键和绑定键的字符串切分成单词，这些单词之间用点隔开。[#]匹配0个或多个单词，[*]匹配一个单词。usa.news -> usa.#  和 #.news
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
