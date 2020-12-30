@@ -2455,23 +2455,185 @@ guest/guest
 
 Exchange类型
 
-direct:路由键与队列名完全匹配。单播模式或点对点模式
+- direct:路由键与队列名完全匹配。单播模式或点对点模式
 
-fanout（扇出）:广播类型或发布订阅模式，不关心路由键，消息被转发到与该交换机绑定的所有队列。
+- fanout（扇出）:广播类型或发布订阅模式，不关心路由键，消息被转发到与该交换机绑定的所有队列。
 
-topic:将路由键和绑定键的字符串切分成单词，这些单词之间用点隔开。[#]匹配0个或多个单词，[*]匹配一个单词。usa.news -> usa.#  和 #.news
+- topic:将路由键和绑定键的字符串切分成单词，这些单词之间用点隔开。[#]匹配0个或多个单词，[*]匹配一个单词。usa.news -> usa.#  和 #.news
 
+### Springboot整合RabbitMQ
 
+1. 引入`spring-boot-starter-amqp`
 
+2. 自动注入`RabbitMessagingTemplate`，`RabbitTemplate`,`AmqpAdmin`,`CachingConnectionFactory`
 
+3. @EnableRabbit
 
+4. ```properties
+   spring.rabbitmq.host=192.168.137.10
+   spring.rabbitmq.port=5672
+   spring.rabbitmq.virtual-host=/
+   ```
 
+5. 测试代码
 
+   ```java
+       @Autowired
+       AmqpAdmin amqpAdmin;
+   
+       @Test
+       void createExchange() {
+           DirectExchange directExchange = new DirectExchange("hello-java-exchange",true,false);
+           amqpAdmin.declareExchange(directExchange);
+       }
+   
+       @Test
+       void createQueue(){
+           Queue queue = new Queue("hello-java-queue",true,false,false);
+           amqpAdmin.declareQueue(queue);
+       }
+   
+       @Test
+       void createBinding(){
+           Binding binding = new Binding("hello-java-queue", Binding.DestinationType.QUEUE,"hello-java-exchange","hello.java",null);
+           amqpAdmin.declareBinding(binding);
+       }
+   
+   ```
 
+6. 发送消息
 
+   ```java
+       @Autowired
+       RabbitTemplate rabbitTemplate;
+   
+       @Test
+       //最后一个参数，是消息的唯一ID，当发送失败的时候，replyCode会返回这个ID
+       void sendMsg(){
+           User user = new User();
+           user.setId("1");
+           user.setName("wh");
+           rabbitTemplate.convertAndSend("hello-java-exchange","hello.java",user, new CorrelationData(UUID.randomUUID().toString()));
+       }
+   ```
+```
+   
+配置Converter
+   
+   ```java
+   @Configuration
+   public class MyRabbitConfig {
+       @Bean
+       public Jackson2JsonMessageConverter messageConverter(){
+           return new Jackson2JsonMessageConverter();
+       }
+   }
+```
 
+7. 接收消息
 
+   @RabbitListener  标注在类和方法，监听哪个队列
 
+   ```java
+       @RabbitListener(queues = "hello-java-queue")
+       public void receiveMsg(Message msg, User content){
+           System.out.println(content);
+       }
+   ```
+
+   @RabbitHanndler  可以接收不同类型的消息
+
+   ```
+       @RabbitHanndler
+       public void receiveMsg(Message msg, User1 content1){
+           System.out.println(content);
+       }
+       @RabbitHanndler
+       public void receiveMsg(Message msg, User2 content2){
+           System.out.println(content);
+       }
+   ```
+
+   #### 可靠送达
+
+   `https://www.rabbitmq.com/reliability.html`
+
+   p(生产者）->  b(broker)  :  confirmCallback 确认模式
+
+   e(交换机)  ->  q(队列)  :  returnCallback 未投递到queue(投递失败)退回模式
+
+   q(队列)   ->   c(消费者)  :  ack ack机制
+
+   ##### 发送端确认
+
+   1. 添加配置
+
+      ```properties
+      spring.rabbitmq.publisher-confirm=true
+      ```
+
+   2. 设置回调
+
+      ```java
+       //MyRabbitConfig对象创建完成后，调用
+          @PostConstruct
+          public void initRabbitTemplate(){
+              rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
+                  /**
+                   * 只要消息成功抵达Queue，b就是true
+                   * @param correlationData 当前消息的唯一关联数据（这个消息的唯一Id）
+                   * @param ack 消息是否成功收到
+                   * @param s 失败的原因
+                   */
+                  @Override
+                  public void confirm(CorrelationData correlationData, boolean ack, String s) {
+                      System.out.println("ack="+ack);
+                  }
+              });
+      
+              rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+                  /**
+                   * 只要消息没有投递到指定的队列，就触发这个失败回调
+                   * @param message 投递失败的消息详细信息
+                   * @param i 回复的状态码
+                   * @param s 回复的文本内容
+                   * @param s1 当时这个消息发给哪个交换机
+                   * @param s2 当时这个消息用哪个路由键
+                   */
+                  @Override
+                  public void returnedMessage(Message message, int i, String s, String s1, String s2) {
+                      System.out.println("fail message:"+message);
+                  }
+              });
+          }
+      ```
+
+   ##### 消费端确认
+   
+   默认自动确认，只要消息接收到，客户端会自动确认，服务端会移除这个消息。
+   
+   问题：收到很多消息，自动回复给服务器ack，只有一个消息处理完成，如果出现异常，消息全部丢失。
+   
+   消费者手动确认：只要程序没有明确通知服务器ack，消息一致是unack状态，即使consumer出现异常，消息也不会丢失，消息会变为ready状态，等待下一次接收。
+   
+   ```properties
+   spring.rabbitmq.listener.simple.acknowledge-mode=manual
+   ```
+   
+   ```java
+       @RabbitListener(queues = "hello-java-queue")
+       public void receiveMsg(Message msg, User content, Channel channel) throws IOException {
+           System.out.println(content);
+           //按顺序自增
+           long deliveryTag = msg.getMessageProperties().getDeliveryTag();
+           //非批量签收
+           channel.basicAck(deliveryTag,false);
+           //拒绝签收
+           //channel.basicNack(deliveryTag,false,false);
+       }
+   ```
+   
+   
 
 
 
