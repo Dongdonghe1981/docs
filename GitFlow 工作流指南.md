@@ -467,5 +467,5 @@ $ git push --all
   git rebase origin/dev
   ```
 
-+ gitrebase有冲突的时候，解决冲突，再执行`git add .`，`git rebase --continue`
++ gitrebase有冲突的时候，解决冲突，再执行`git add .`，`git rebase --continue`，千万不要`commit`
 
