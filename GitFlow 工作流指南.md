@@ -255,7 +255,7 @@ develop                 #内容
 + git push -u origin master
 
 ```shell
-#添加远程仓库 origin 代替后面的url
+#添加远程仓库 origin 代替后面的url，即别名
 git remote add origin https://github.com/Dongdonghe1981/newrepo.git
 $ git remote
 origin
@@ -281,3 +281,191 @@ git remote remove origin
 
 2. 上传代码到该远程仓库
 3. 在浏览器中直接输入创建的远程仓库的名字，就可以浏览该仓库中代码运行的效果
+
+### 如何获取远程项目
+
++ git clone 远程仓库地址  项目名
+
+  自动进行checkout
+
++ git clone --no-checkout
+
+  不checkout，下载的目录是空，进到目录中，再执行`git checkout master`，有文件
+
+  应用场景：master分支太大，可以checkout 指定的分支
+
++ git clone --bare 远程仓库地址    #只下载仓库信息
+
+### Pull详解
+
++ git pull
+
+  git fetch + git merge
+
++ git fetch    #将远程的内容拉取下来，但并不跟本地内容合并
+
++ git merge  #将拉取下来的内容跟本地合并
+
+#### git push 发生冲突
+
+```shell
+$ git push (master)
+To https://github.com/Dongdonghe1981/design-pattern.git
+ ! [rejected]        master -> master (fetch first)
+
+$ git pull (master|MERGING)
+
+手动merge
+
+$ git commit -am 'change local'
+
+$ git push (master)
+
+#有的公司可能设置为不同的git地址
+$ git remote -v
+origin  https://github.com/Dongdonghe1981/design-pattern.git (fetch)
+origin  https://github.com/Dongdonghe1981/design-pattern.git (push)
+```
+
+### 删除远程分支，仓库迁移
+
++ git push origin --delete 分支名
++ git remote set-url origin 远程仓库的地址
+
+```shell
+#列出所有分支和远程追踪分支
+git branch -a
+* master  #本地分支
+  remotes/origin/HEAD -> origin/master 
+  remotes/origin/master #远程追踪分支
+  remotes/origin/new1 #远程追踪分支
+  remotes/origin/new2 #远程追踪分支
+
+#本地不可以切换到远程分支
+$ git checkout origin/new1
+Note: switching to 'origin/new1'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at 47c06ed change local
+
+#直接写远程的分支名，就自动切换到远程分支
+$ git checkout new1
+Switched to a new branch 'new1'
+Branch 'new1' set up to track remote branch 'new1' from 'origin'.
+
+HP@LAPTOP-3JV4RUIN MINGW64 ~/Desktop/git_project/design-pattern2 (new1)
+$ git branch -a
+  master
+* new1
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/new1
+  remotes/origin/new2
+#删除本地分支，先切换到其他分支
+$ git branch -d new1
+Deleted branch new1 (was 47c06ed).
+
+#删除远程分支和远程追踪分支
+git push origin --delete new1
+```
+
+仓库迁移，设置origin库的url为新的仓库的url
+
+```shell
+$ git remote -v
+origin  https://github.com/Dongdonghe1981/design-pattern.git (fetch)
+origin  https://github.com/Dongdonghe1981/design-pattern.git (push)
+
+$ git remote set-url origin https://github.com/Dongdonghe1981/design-pattern2.git
+
+$ git remote -v
+origin  https://github.com/Dongdonghe1981/design-pattern2.git (fetch)
+origin  https://github.com/Dongdonghe1981/design-pattern2.git (push)
+
+#将本地仓库的内容提交到新的远程仓库
+$ git push --all
+```
+
+### GitHub自动部署
+
+1. 修改的代码提交到github仓库
+2. github打包，上传到阿里云服务器
+3. 阿里云服务器更新
+4. 查看项目地址，发生变化
+
+### rebase(变基)  -- 使git记录简洁
+
++ 将多个提交记录整合成一个记录
+
+  注意：如果已经提交到远程仓库，最好不要进行rebase
+
+  ```shell
+  git rebase -i HEAD~3   #最新的3次记录进行合并
+  vi 合并的版本前用s
+  vi 标注合并后的注释
+  ```
+
++ 将dev分支rebase到master分支
+
+  ```shell
+  $ git log --oneline --graph --all
+  * 1ad2113 (master) master 1
+  *   b284e77 Merge branch 'dev'
+  |\
+  * | 2119469 master txt
+  | | * ebab521 (HEAD -> dev) dev branch commit 1
+  | |/
+  | * 4974de3 dev brach
+  |/
+  * e0a90f7 v1 & v2 & v3
+  
+  $ git checkout dev
+  $ git rebase master
+  Successfully rebased and updated refs/heads/dev.
+  $ git checkout master
+  $ git log --oneline --graph --all
+  * f0c2911 (dev) dev branch commit 1
+  * 1ad2113 (HEAD -> master) master 1
+  *   b284e77 Merge branch 'dev'
+  |\
+  | * 4974de3 dev brach
+  * | 2119469 master txt
+  |/
+  * e0a90f7 v1 & v2 & v3
+  
+  $ git merge dev
+  $ git log --oneline --graph --all
+  * f0c2911 (HEAD -> master, dev) dev branch commit 1
+  * 1ad2113 master 1
+  *   b284e77 Merge branch 'dev'
+  |\
+  | * 4974de3 dev brach
+  * | 2119469 master txt
+  |/
+  * e0a90f7 v1 & v2 & v3
+  
+  ```
+
++ 本地commit，远程代码不一致时
+
+  ```shell
+  git fetch origin dev
+  git rebase origin/dev
+  ```
+
++ gitrebase有冲突的时候，解决冲突，再执行`git add .`，`git rebase --continue`
+
