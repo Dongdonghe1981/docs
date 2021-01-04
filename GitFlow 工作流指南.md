@@ -469,3 +469,10 @@ $ git push --all
 
 + gitrebase有冲突的时候，解决冲突，再执行`git add .`，`git rebase --continue`，千万不要`commit`
 
+### GitLab CI/CD
+
++ CI  持续集成  -集成测试
++ CD 持续交付 -集成测试 -> 部署 -> 发布
++ CD 持续部署 -集成测试 -> 部署 -> 监控 -> 开发 -> 构建 -> 
+
+### GitLab Runner
